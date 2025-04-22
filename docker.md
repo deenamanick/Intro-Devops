@@ -21,6 +21,7 @@ docker image history <image_name>   # Show image layer history
 ```bash
 docker run busybox                      # Run container
 docker run -it --rm busybox bash          # Run interactively + auto-remove
+docker ps
 docker ps -a --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"  # Custom format
 docker stop $(docker ps -aq)                   # Stop all containers
 docker rm $(docker ps -aq)                     # Remove all containers
@@ -48,6 +49,14 @@ docker top <container_name>                    # View running processes
 • docker exec mysql3 mysql -pdb_pass123 -e 'use sat;select * from student'
 ```
 
+```
+
+• docker run -it ubuntu
+• apt-get update
+• apt-get install mysql-client
+• mysql -u root -h 192.168.0.23 -pdb_pass123
+
+```
 ---
 
 ## 🧰 **Intermediate Docker Commands**
