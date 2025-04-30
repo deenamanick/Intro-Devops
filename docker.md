@@ -106,6 +106,22 @@ docker run --dns 8.8.8.8 <image>             # Custom DNS
 ```
 
 ### 🔸 Docker Compose (Production-Ready)
+
+### Make sure the following package has been installed already.
+
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+sudo yum install docker
+sudo systemctl start docker
+sudo chmod 777 /var/run/docker.sock
+docker-compose -f docker-compose.prod.yml up --build -d
+
+```
+
+
+
 ```yaml
 version: '3.8'
 
@@ -179,6 +195,9 @@ networks:
 
 ```bash
 docker-compose -f docker-compose.prod.yml up --build -d
+
+## Verification
+http://localhost:80
 ```
 
 ### 🔸 Multi-Stage Builds (Optimized Images)
