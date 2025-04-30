@@ -116,8 +116,6 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo yum install docker
 sudo systemctl start docker
 sudo chmod 777 /var/run/docker.sock
-docker-compose -f docker-compose.prod.yml up --build -d
-
 ```
 
 
