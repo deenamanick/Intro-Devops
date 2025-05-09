@@ -13,27 +13,28 @@
    ➤ *Command:* `docker ps -a`
 
 5. **Scenario: Your web server container crashed. Restart it. Make sure web-server container should be running already**
+   
    ➤ *Command:* `docker start web-server`
    
    *Example* - `docker run -d --name web-server -p 8080:80 nginx`
 
-6. **Scenario: You need to stop a misbehaving container.**
+7. **Scenario: You need to stop a misbehaving container.**
    
    ➤ *Command:* `docker stop web-server`
 
-7. **Scenario: The app container needs a fresh restart after config change.**
+8. **Scenario: The app container needs a fresh restart after config change.**
     
    ➤ *Command:* `docker restart app-container`
 
-8. **Scenario: Remove unnecessary containers to free space.**
+9. **Scenario: Remove unnecessary containers to free space.**
 
    ➤ *Command:* `docker rm old_container`
 
-9. **Scenario: Your manager asks you to launch a new NGINX server.**
+10. **Scenario: Your manager asks you to launch a new NGINX server.**
     
    ➤ *Command:* `docker run -d --name web nginx`
 
-10. **Scenario: You need shell access to a container to check logs manually.**
+11. **Scenario: You need shell access to a container to check logs manually.**
     
    ➤ *Command:* `docker exec -it web bash`
 
