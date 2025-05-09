@@ -17,27 +17,27 @@
    
    *Example* - `docker run -d --name web-server -p 8080:80 nginx`
 
-7. **Scenario: You need to stop a misbehaving container.**
+6. **Scenario: You need to stop a misbehaving container.**
    
    ➤ *Command:* `docker stop web-server`
 
-9. **Scenario: The app container needs a fresh restart after config change.**
+7. **Scenario: The app container needs a fresh restart after config change.**
     
    ➤ *Command:* `docker restart app-container`
 
-11. **Scenario: Remove unnecessary containers to free space.**
+8. **Scenario: Remove unnecessary containers to free space.**
 
    ➤ *Command:* `docker rm old_container`
 
-14. **Scenario: Your manager asks you to launch a new NGINX server.**
+9. **Scenario: Your manager asks you to launch a new NGINX server.**
     
    ➤ *Command:* `docker run -d --name web nginx`
 
-16. **Scenario: You need shell access to a container to check logs manually.**
+10. **Scenario: You need shell access to a container to check logs manually.**
     
    ➤ *Command:* `docker exec -it web bash`
 
-18. **Scenario: Investigate container logs for a failed deployment.**
+11. **Scenario: Investigate container logs for a failed deployment.**
     
     ➤ *Command:* `docker logs web`
 
@@ -45,7 +45,7 @@
 
 ### 📦 **Image Management Scenarios**
 
-11. **Scenario: You want to check if the required image is available locally.**
+12. **Scenario: You want to check if the required image is available locally.**
     
     ➤ *Command:* `docker images`
 
@@ -53,32 +53,32 @@
     
     ➤ *Command:* `docker image prune -a`
 
-15. **Scenario: Pull a Redis image for an upcoming project.**
+14. **Scenario: Pull a Redis image for an upcoming project.**
     
     ➤ *Command:* `docker pull redis`
 
-17. **Scenario: Build a new Docker image from a project folder.**
+15. **Scenario: Build a new Docker image from a project folder.**
     
     ➤ *Command:* `docker build -t myapp:latest .`
 
-22. **Scenario: Check what's inside a custom image.**
+16. **Scenario: Check what's inside a custom image.**
     
     ➤ *Command:* `docker inspect myapp:latest`
 
-24. **Scenario: Compare two images for differences.**
+17. **Scenario: Compare two images for differences.**
     
     ➤ *Command:* `docker history <image_id>`
 
-26. **Scenario: Search for a lightweight Apache image.**
+18. **Scenario: Search for a lightweight Apache image.**
     
     ➤ *Command:* `docker search httpd`
 
 ---
 
-28. **Scenario: Deploy NGINX and expose it on port 8080.**
+19. **Scenario: Deploy NGINX and expose it on port 8080.**
     ➤ *Command:* `docker run -d -p 8080:80 nginx`
 
-31. **Scenario: Inspect how a container sees the network.**
+20. **Scenario: Inspect how a container sees the network.**
     
     ➤ *Command:* `docker exec -it web ping mysql`
 
@@ -113,19 +113,115 @@ CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
 
 ```
     
-➤ *Command:* `docker build -t nodeapp .`
+➤ *Command:* `docker build -t web-site .`
+
+
 
 38. **Scenario: Use Docker Compose to bring up a multi-container app.**
+
+### **Running an Application Using Docker Compose (Simple Example)**  
+
+Let’s say you have a **Python Flask app** that connects to a **Redis** database. Instead of running multiple `docker run` commands, you can use `docker-compose.yml` to define and manage both services together.  
+
+---
+
+## **Step 1: Project Structure**
+```
+my-flask-app/
+├── app.py          # Flask application
+├── requirements.txt
+└── docker-compose.yml
+```
+
+### **1. `app.py` (Flask Application)**
+```python
+from flask import Flask
+import redis
+
+app = Flask(__name__)
+cache = redis.Redis(host='redis', port=6379)
+
+@app.route('/')
+def hello():
+    count = cache.incr('hits')
+    return f"Hello! This page has been viewed {count} times."
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
+```
+
+### **2. `requirements.txt`**
+```
+flask
+redis
+```
+
+---
+
+## **Step 2: Create `docker-compose.yml`**
+```yaml
+version: '3.8'
+
+services:
+  web:
+    build: .          # Builds from Dockerfile in current dir
+    ports:
+      - "5000:5000"   # Maps host:container port
+    depends_on:
+      - redis         # Ensures Redis starts first
+
+  redis:
+    image: "redis:alpine"  # Uses official Redis image
+```
+
+---
+
+## **Step 3: Run the Application**
+1. **Build and start services** (Flask + Redis):
+   ```bash
+   docker-compose up
+   ```
+   - Runs both services in the foreground (logs visible).  
+   - Use `-d` to run in detached mode:  
+     ```bash
+     docker-compose up -d
+     ```
+
+2. **Check running services:**
+   ```bash
+   docker-compose ps
+   ```
+   Example output:
+   ```
+   Name                Command               State           Ports         
+   ---------------------------------------------------------------------
+   my-flask-app-web    python app.py         Up      0.0.0.0:5000->5000/tcp
+   my-flask-app-redis  docker-entrypoint.sh  Up      6379/tcp
+   ```
+
+3. **Access the Flask app:**  
+   Open `http://localhost:5000` in your browser.  
+   Each refresh increments the Redis counter!
+
+4. **Stop the services:**
+   ```bash
+   docker-compose down
+   ```
+   - Stops and removes containers, networks, and volumes (if any).
+
+---
+
+🚀 **Now try running your own multi-container app!** 🐳
     
     ➤ *Command:* `docker-compose up -d`
 
-40. **Scenario: Tear down the entire multi-container stack.**
+39. **Scenario: Tear down the entire multi-container stack.**
     ➤ *Command:* `docker-compose down`
 
-41. **Scenario: Rebuild only a specific service.**
+40. **Scenario: Rebuild only a specific service.**
     ➤ *Command:* `docker-compose build web`
 
-42. **Scenario: Scale up the number of containers for load testing.**
+41. **Scenario: Scale up the number of containers for load testing.**
     ➤ *Command:* `docker-compose up --scale web=3`
 
 ---
