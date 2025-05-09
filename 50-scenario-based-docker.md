@@ -46,121 +46,61 @@
 ### 📦 **Image Management Scenarios**
 
 11. **Scenario: You want to check if the required image is available locally.**
+    
     ➤ *Command:* `docker images`
 
-12. **Scenario: Clean up unused images to save disk space.**
+13. **Scenario: Clean up unused images to save disk space.**
+    
     ➤ *Command:* `docker image prune -a`
 
-13. **Scenario: Pull a Redis image for an upcoming project.**
+15. **Scenario: Pull a Redis image for an upcoming project.**
+    
     ➤ *Command:* `docker pull redis`
 
-14. **Scenario: Build a new Docker image from a project folder.**
+17. **Scenario: Build a new Docker image from a project folder.**
+    
     ➤ *Command:* `docker build -t myapp:latest .`
 
-15. **Scenario: You need to upload a custom image to Docker Hub.**
-    ➤ *Command:*
-
-    ```
-    docker tag myapp yourdockerhub/myapp  
-    docker push yourdockerhub/myapp
-    ```
-
-16. **Scenario: Download an image from a colleague as a tar file. Load it.**
-    ➤ *Command:* `docker load -i myapp.tar`
-
-17. **Scenario: Save your current Docker image to share offline.**
-    ➤ *Command:* `docker save -o myapp.tar myapp:latest`
-
-18. **Scenario: Check what's inside a custom image.**
+22. **Scenario: Check what's inside a custom image.**
+    
     ➤ *Command:* `docker inspect myapp:latest`
 
-19. **Scenario: Compare two images for differences.**
+24. **Scenario: Compare two images for differences.**
+    
     ➤ *Command:* `docker history <image_id>`
 
-20. **Scenario: Search for a lightweight Apache image.**
+26. **Scenario: Search for a lightweight Apache image.**
+    
     ➤ *Command:* `docker search httpd`
 
 ---
 
-### 🌐 **Networking Scenarios**
-
-21. **Scenario: Check existing networks used by containers.**
-    ➤ *Command:* `docker network ls`
-
-22. **Scenario: Create a custom bridge network for isolated communication.**
-    ➤ *Command:* `docker network create backend-net`
-
-23. **Scenario: Launch a MySQL container inside a custom network.**
-    ➤ *Command:* `docker run -d --name mysql --network backend-net mysql`
-
-24. **Scenario: Connect a running container to another network.**
-    ➤ *Command:* `docker network connect backend-net web`
-
-25. **Scenario: Disconnect a container to isolate it.**
-    ➤ *Command:* `docker network disconnect backend-net web`
-
-26. **Scenario: Deploy NGINX and expose it on port 8080.**
+28. **Scenario: Deploy NGINX and expose it on port 8080.**
     ➤ *Command:* `docker run -d -p 8080:80 nginx`
 
-27. **Scenario: Run a local Flask app and bind two ports.**
-    ➤ *Command:* `docker run -d -p 5000:5000 -p 8000:8000 myflaskapp`
-
-28. **Scenario: You want maximum speed — use host network mode.**
-    ➤ *Command:* `docker run --network host myservice`
-
-29. **Scenario: Inspect how a container sees the network.**
+31. **Scenario: Inspect how a container sees the network.**
+    
     ➤ *Command:* `docker exec -it web ping mysql`
-
-30. **Scenario: Check which containers are on a specific network.**
-    ➤ *Command:* `docker network inspect backend-net`
-
----
-
-### 🛠️ **Volumes and Persistent Data Scenarios**
-
-31. **Scenario: Create a volume for persistent data.**
-    ➤ *Command:* `docker volume create mydata`
-
-32. **Scenario: Use the volume in a Postgres container.**
-    ➤ *Command:*
-
-    ```bash
-    docker run -d --name pg \
-      -e POSTGRES_PASSWORD=pass \
-      -v mydata:/var/lib/postgresql/data postgres
-    ```
-
-33. **Scenario: Inspect what's inside the volume.**
-    ➤ *Command:* `docker volume inspect mydata`
-
-34. **Scenario: Remove a volume that’s no longer in use.**
-    ➤ *Command:* `docker volume rm mydata`
-
-35. **Scenario: List all volumes and clean unused ones.**
-    ➤ *Command:*
-
-    ```bash
-    docker volume ls  
-    docker volume prune -f
-    ```
 
 ---
 
 ### 📁 **Dockerfile & Compose Scenarios**
 
 36. **Scenario: Build an image using Dockerfile for a Node.js app.**
+    
     ➤ *Command:* `docker build -t nodeapp .`
 
-37. **Scenario: Use Docker Compose to bring up a multi-container app.**
+38. **Scenario: Use Docker Compose to bring up a multi-container app.**
+    
     ➤ *Command:* `docker-compose up -d`
 
-38. **Scenario: Tear down the entire multi-container stack.**
+40. **Scenario: Tear down the entire multi-container stack.**
     ➤ *Command:* `docker-compose down`
 
-39. **Scenario: Rebuild only a specific service.**
+41. **Scenario: Rebuild only a specific service.**
     ➤ *Command:* `docker-compose build web`
 
-40. **Scenario: Scale up the number of containers for load testing.**
+42. **Scenario: Scale up the number of containers for load testing.**
     ➤ *Command:* `docker-compose up --scale web=3`
 
 ---
