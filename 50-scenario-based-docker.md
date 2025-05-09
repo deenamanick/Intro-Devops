@@ -76,9 +76,10 @@
 ---
 
 19. **Scenario: Deploy NGINX and expose it on port 8080.**
+    
     ➤ *Command:* `docker run -d -p 8080:80 nginx`
 
-20. **Scenario: Inspect how a container sees the network.**
+21. **Scenario: Inspect how a container sees the network.**
     
     ➤ *Command:* `docker exec -it web ping mysql`
 
@@ -112,9 +113,8 @@ EXPOSE 80
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
 
 ```
-    
+  
 ➤ *Command:* `docker build -t web-site .`
-
 
 
 38. **Scenario: Use Docker Compose to bring up a multi-container app.**
@@ -215,15 +215,6 @@ services:
     
     ➤ *Command:* `docker-compose up -d`
 
-39. **Scenario: Tear down the entire multi-container stack.**
-    ➤ *Command:* `docker-compose down`
-
-40. **Scenario: Rebuild only a specific service.**
-    ➤ *Command:* `docker-compose build web`
-
-41. **Scenario: Scale up the number of containers for load testing.**
-    ➤ *Command:* `docker-compose up --scale web=3`
-
 ---
 
 ### 🔐 **Security and Resource Control Scenarios**
@@ -232,19 +223,8 @@ services:
     ➤ *Command:* `docker run -d --memory=200m myapp`
 
 42. **Scenario: Limit CPU usage of a container.**
+    
     ➤ *Command:* `docker run -d --cpus=1 myapp`
-
-43. **Scenario: Scan your image for vulnerabilities (Docker Desktop or Trivy).**
-    ➤ *Command:* `trivy image myapp`
-
-44. **Scenario: Run container as non-root user.**
-    ➤ *Dockerfile Sample:*
-
-    ```dockerfile
-    FROM node  
-    RUN useradd -m appuser  
-    USER appuser  
-    ```
 
 ---
 
@@ -265,14 +245,4 @@ services:
 49. **Scenario: Copy logs or config from container to host.**
     ➤ *Command:* `docker cp <container_id>:/app/logs ./logs`
 
-50. **Scenario: You broke the container config. Roll it back using a new version tag.**
-    ➤ *Command:*
 
-    ```bash
-    docker pull myapp:v1.1  
-    docker run -d myapp:v1.1
-    ```
-
----
-
-Would you like this list as a downloadable PDF or formatted as a learning handout for students?
