@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item Manager</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f7f9fc, #e3f2fd);
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            background-color: white;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        #item-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        #item-name {
+            padding: 10px;
+            width: 60%;
+            border: 2px solid #90caf9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        #items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .item-card {
+            padding: 12px 18px;
+            background-color: #e3f2fd;
+            border-left: 6px solid #2196F3;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 16px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .no-items {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>📋 Item Manager</h1>
+
+    <div id="item-form">
+        <input type="text" id="item-name" placeholder="Enter item name">
+        <button onclick="addItem()">Add Item</button>
+    </div>
+
+    <h2>🗂 Items List</h2>
+    <div id="items-list" class="no-items">Loading items...</div>
+
+    <script>
+        function fetchItems() {
+            fetch('http://54.161.146.231:5000/api/items')
+                .then(response => response.json())
+                .then(items => {
+                    const itemsList = document.getElementById('items-list');
+                    if (!items.length) {
+                        itemsList.innerHTML = '<div class="no-items">No items found.</div>';
+                        return;
+                    }
+
+                    itemsList.innerHTML = items.map(item =>
+                        `<div class="item-card">#${item.id} — ${item.name}</div>`
+                    ).join('');
+                })
+                .catch(error => {
+                    document.getElementById('items-list').innerHTML =
+                        `<div class="no-items">Error loading items.</div>`;
+                    console.error('Error:', error);
+                });
+        }
+
+        function addItem() {
+            const nameInput = document.getElementById('item-name');
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            fetch('http://54.161.146.231:5000/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            })
+            .then(() => {
+                nameInput.value = '';
+                fetchItems();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchItems);
+    </script>
+</body>
+</html>
+
