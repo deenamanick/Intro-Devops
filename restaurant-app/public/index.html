@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Listing</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background: #f4f4f9;
+            color: #333;
+            margin: 0; 
+            padding: 0;
+        }
+        h1 {
+            background: #007bff; 
+            color: white; 
+            padding: 15px; 
+            margin: 0;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 50%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        input {
+            width: 30%;
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #28a745; /* Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍽️ Restaurant Listing</h1>
+
+    <!-- Restaurant Input Form -->
+    <form id="restaurant-form">
+        <input type="text" id="name" placeholder="Restaurant Name" required>
+        <input type="text" id="location" placeholder="Location" required>
+        <input type="text" id="cuisine" placeholder="Cuisine Type" required>
+        <button type="submit">➕ Add Restaurant</button>
+    </form>
+
+    <!-- Button to Load Restaurants -->
+    <button onclick="fetchRestaurants()" style="background:#ffc107;">🔄 Load Restaurants</button>
+
+    <!-- Restaurants Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Cuisine</th>
+            </tr>
+        </thead>
+        <tbody id="restaurant-table">
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch restaurants from the backend
+        function fetchRestaurants() {
+            fetch('http://localhost:3000/restaurants')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.getElementById("restaurant-table");
+                    tableBody.innerHTML = ""; // Clear old data
+                    data.forEach(restaurant => {
+                        let row = `<tr>
+                            <td>${restaurant.id}</td>
+                            <td>${restaurant.name}</td>
+                            <td>${restaurant.location}</td>
+                            <td>${restaurant.cuisine}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error fetching restaurants:", error));
+        }
+
+        // Handle form submission (Add a restaurant)
+        document.getElementById("restaurant-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form refresh
+
+            // Get user input values
+            const name = document.getElementById("name").value;
+            const location = document.getElementById("location").value;
+            const cuisine = document.getElementById("cuisine").value;
+
+            // Send POST request to add restaurant
+            fetch('http://localhost:3000/restaurants', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, location, cuisine })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Added:", data);
+                fetchRestaurants(); // Reload restaurants list
+                document.getElementById("restaurant-form").reset(); // Clear form
+            })
+            .catch(error => console.error("Error adding restaurant:", error));
+        });
+
+        // Load restaurants initially
+        fetchRestaurants();
+    </script>
+</body>
+</html>
