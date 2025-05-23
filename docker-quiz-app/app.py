@@ -121,6 +121,31 @@ HTML_TEMPLATE = '''
             font-size: 1.5em;
             margin-top: 30px;
         }
+        .incorrect-answers {
+            margin-top: 30px; /* Added more top margin */
+            padding: 20px; /* Increased padding */
+            border: 1px solid #f0ad4e;
+            border-radius: 8px; /* Slightly more rounded */
+            background-color: #fef0e0;
+        }
+        .incorrect-answers h2 {
+            color: #d9534f;
+            margin-bottom: 15px; /* More space below heading */
+        }
+        .incorrect-answers p {
+            margin-bottom: 10px; /* More space between incorrect answers */
+            line-height: 1.6; /* Improved readability */
+        }
+        .correct-answer {
+            color: green;
+            font-weight: bold;
+            display: block; /* Make each part a new line */
+        }
+        .your-answer {
+            color: red;
+            font-weight: bold;
+            display: block; /* Make each part a new line */
+        }
     </style>
 </head>
 <body>
@@ -203,14 +228,21 @@ def index():
 def submit():
     score = 0
     total = len(QUESTIONS)
+    incorrect_answers = []
     for q in QUESTIONS:
         question_id = str(q['id'])
         ans = request.form.get(f"q{question_id}")
         if ans is not None:
             try:
-                submitted_answer = int(ans)
-                if submitted_answer == q['answer']:
+                submitted_answer_index = int(ans)
+                if submitted_answer_index == q['answer']:
                     score += 1
+                else:
+                    incorrect_answers.append({
+                        "question": q['question'],
+                        "correct_answer": q['options'][q['answer']],
+                        "your_answer": q['options'][submitted_answer_index]
+                    })
             except ValueError:
                 print(f"Warning: Invalid answer submitted for question {question_id}: {ans}")
         else:
@@ -221,6 +253,15 @@ def submit():
         congrats_message = "<div class='congrats'>🥳 👏 Congratulations! 🎉 You got a perfect score: {} / {}! 🌟 Cheers! 🥂</div>".format(score, total)
     else:
         congrats_message = "<div class='congrats'>Your Score: {} / {}</div>".format(score, total)
+
+    incorrect_answers_html = ""
+    if incorrect_answers:
+        incorrect_answers_html = "<div class='incorrect-answers'><h2>Incorrect Answers</h2>"
+        for answer in incorrect_answers:
+            incorrect_answers_html += f"<p><strong>Question:</strong> {answer['question']}<br>"
+            incorrect_answers_html += f"<span class='correct-answer'>Correct Answer: {answer['correct_answer']}</span><br>"
+            incorrect_answers_html += f"<span class='your-answer'>Your Answer: {answer['your_answer']}</span></p>"
+        incorrect_answers_html += "</div>"
 
     return f"""
     <style>
@@ -244,8 +285,34 @@ def submit():
             font-size: 1.5em;
             margin-top: 30px;
         }}
+        .incorrect-answers {{
+            margin-top: 30px; /* Added more top margin */
+            padding: 20px; /* Increased padding */
+            border: 1px solid #f0ad4e;
+            border-radius: 8px; /* Slightly more rounded */
+            background-color: #fef0e0;
+        }}
+        .incorrect-answers h2 {{
+            color: #d9534f;
+            margin-bottom: 15px; /* More space below heading */
+        }}
+        .incorrect-answers p {{
+            margin-bottom: 10px; /* More space between incorrect answers */
+            line-height: 1.6; /* Improved readability */
+        }}
+        .correct-answer {{
+            color: green;
+            font-weight: bold;
+            display: block; /* Make each part a new line */
+        }}
+        .your-answer {{
+            color: red;
+            font-weight: bold;
+            display: block; /* Make each part a new line */
+        }}
     </style>
-    {congrats_message}
+    {congrats_message}<br>
+    {incorrect_answers_html}
     """
 
 if __name__ == '__main__':
