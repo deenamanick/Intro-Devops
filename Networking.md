@@ -928,6 +928,12 @@ Whenever you visit a website like **Amazon**, your web browser (Chrome, Firefox,
 
 ![image](https://github.com/user-attachments/assets/3e8a3438-fa79-4e4f-93a1-cbde103f5a3e)
 
+
+**HTTP (HyperText Transfer Protocol)** is the set of rules used to load web pages by communicating with web servers. It was created by Tim Berners-Lee between 1989–1991.
+
+**HTTPS (HyperText Transfer Protocol Secure)** is the secure, encrypted version of HTTP. It protects data and ensures you're connected to the right server.
+
+
 ### **What happens while running below Command**
 
 ```
