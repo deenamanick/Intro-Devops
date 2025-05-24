@@ -49,13 +49,18 @@ A **computer network** is a group of interconnected computers that communicate w
 ![image](https://github.com/user-attachments/assets/1419f69e-76ca-4e9d-a73c-fdec35976515)
 
 
-1. **Physical Layer** – Deals with physical transmission (e.g., cables, radio waves).
+1. **Physical Layer** – Deals with physical transmission (e.g., cables, radio waves). ![image](https://github.com/user-attachments/assets/a3b5e29b-1bec-433a-95ef-156262d98331)
+
 2. **Data Link Layer** – Handles MAC addressing and error detection.
-3. **Network Layer** – Manages IP addressing and routing.
-4. **Transport Layer** – Ensures reliable communication using TCP/UDP.
+3. **Network Layer** – Manages IP addressing and routing. ![image](https://github.com/user-attachments/assets/7fac8029-6b10-45db-bb45-2d71d4303f38)
+
+4. **Transport Layer** – Ensures reliable communication using TCP/UDP. ![image](https://github.com/user-attachments/assets/d10b14a6-a2a2-4e9a-87fc-8fae62e7d1bb)
+
 5. **Session Layer** – Maintains communication sessions.
 6. **Presentation Layer** – Converts data formats (e.g., encryption).
-7. **Application Layer** – Provides network services to users (e.g., HTTP, FTP).
+7. **Application Layer** – Provides network services to users (e.g., HTTP, FTP). ![image](https://github.com/user-attachments/assets/39971bbf-6936-424a-92bb-eb90dd3d6a88)
+
+   
 
 ### **TCP/IP Model (4 Layers)**
 
@@ -99,11 +104,16 @@ Subnetting divides a large network into smaller networks.
 
 ## **4. Network Devices**
 ### **Router**
+
+A router connects different networks and directs data between them using routing. Routing creates paths for data to travel across networks. Routers work at Layer 3 of the OSI model and often include interfaces for setting rules like port forwarding and firewalling.
+
 - Connects different networks.
 - Uses IP addresses to route data.
 - Example: Home router connects your LAN to the Internet.
 
   ![image](https://github.com/user-attachments/assets/dccf643f-642b-4feb-a593-d7e2e021f5b2)
+  ![image](https://github.com/user-attachments/assets/ff1e3949-0ff1-40c8-927a-0b8001c05c03)
+
 
 
 ### **Switch**
@@ -111,6 +121,8 @@ Subnetting divides a large network into smaller networks.
 - Uses MAC addresses to forward data efficiently.
 
   ![image](https://github.com/user-attachments/assets/05777874-065f-43fe-abe8-ba8a824d0399)
+
+![image](https://github.com/user-attachments/assets/131f2802-5fc2-4a45-93d1-8ca8231d2d75)
 
 ---
 
@@ -162,6 +174,9 @@ Subnetting divides a large network into smaller networks.
 ● Depending on the purpose of the protocol
 
 ● TCP, UDP, HTTP, gRPC, FTP
+
+![Uploading image.png…]()
+
 
 ## Protocol Properties
 
