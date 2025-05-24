@@ -928,11 +928,63 @@ Whenever you visit a website like **Amazon**, your web browser (Chrome, Firefox,
 
 ![image](https://github.com/user-attachments/assets/3e8a3438-fa79-4e4f-93a1-cbde103f5a3e)
 
+### **What is Http?**
 
 **HTTP (HyperText Transfer Protocol)** is the set of rules used to load web pages by communicating with web servers. It was created by Tim Berners-Lee between 1989–1991.
 
 **HTTPS (HyperText Transfer Protocol Secure)** is the secure, encrypted version of HTTP. It protects data and ensures you're connected to the right server.
 
+When you use a browser, it mainly communicates via **HTTP** and **HTTPS**, which rely on **TCP**. HTTPS is the secure version of HTTP.
+
+Common HTTP methods:
+
+* **GET** – fetches data (e.g., a webpage or image). Basically getting the information from a web server
+* **POST** – submits data (e.g., forms). Used for submitting data to the web server and potentially creating new records
+* **PUT** – creates or updates data. Used for submitting data to a web server to update information.
+* **DELETE** – removes data. Used for deleting information/ records from a web server.
+
+HTTP typically uses **port 80**, and HTTPS uses **port 443**. Other ports like **8080** and **8443** are also used sometimes.
+
+
+### 🌐 What is a URL? (Uniform Resource Locator)
+
+**Jeevi Academy**
+
+A URL is the address used to access resources on the internet. It tells your browser how and where to find content. Here's a breakdown of a full URL:
+
+---
+
+#### 📘 Sample URL:
+
+**`http://user:password@jeeviacademy.com:80/view-course?id=101#section2`**
+
+---
+
+### 🧩 Parts of a URL:
+
+| Component        | Description                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------- |
+| **Scheme**       | `http` — Defines the protocol used to access the resource (e.g., `http`, `https`, `ftp`). |
+| **User**         | `user:password` — Optional credentials used to log in to some services.                   |
+| **Host/Domain**  | `jeeviacademy.com` — The domain name or IP address of the web server.                     |
+| **Port**         | `80` — The communication port. HTTP uses 80; HTTPS uses 443.                              |
+| **Path**         | `/view-course` — The specific page or resource on the server.                             |
+| **Query String** | `?id=101` — Sends additional data to the server, often used in dynamic web pages.         |
+| **Fragment**     | `#section2` — Points to a specific section within the page.                               |
+
+---
+
+### ✅ Example Explained:
+
+* **Scheme**: `http` → Protocol to use
+* **User**: `user:password` → Optional login credentials
+* **Host**: `jeeviacademy.com` → Website domain
+* **Port**: `80` → Standard HTTP port
+* **Path**: `/view-course` → Specific page or content
+* **Query**: `?id=101` → Request course with ID 101
+* **Fragment**: `#section2` → Jump to section 2 of the page
+
+---
 
 ### **What happens while running below Command**
 
