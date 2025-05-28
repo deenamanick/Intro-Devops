@@ -25,10 +25,6 @@
    mkdir myfolder
    mkdir -p dir1/dir2/dir3  # Create nested directories
    ```
-5. **`rmdir`** - Remove an empty directory.
-   ```bash
-   rmdir myfolder
-   ```
 6. **`touch`** - Create an empty file or update timestamps.
    ```bash
    touch file.txt
@@ -61,45 +57,10 @@
     ```bash
     cat file.txt
     ```
-12. **`more`** - View file content page by page.
-    ```bash
-    more file.txt
-    ```
-13. **`less`** - View file content with backward navigation.
-    ```bash
-    less file.txt
-    ```
-14. **`head`** - Display the beginning of a file.
-    ```bash
-    head -n 10 file.txt  # Show first 10 lines
-    ```
-15. **`tail`** - Display the end of a file.
-    ```bash
-    tail -n 10 file.txt  # Show last 10 lines
-    tail -f logfile.log  # Follow real-time updates
-    ```
 16. **`grep`** - Search text using patterns.
     ```bash
     grep "pattern" file.txt
     grep -i "pattern" file.txt  # Case-insensitive search
-    ```
-17. **`awk`** - Pattern scanning and processing.
-    ```bash
-    awk '{print $1}' file.txt  # Print the first column
-    ```
-18. **`sed`** - Stream editor for text manipulation.
-    ```bash
-    sed 's/old/new/' file.txt  # Replace text
-    sed -i 's/old/new/' file.txt  # Edit file in place
-    ```
-19. **`cut`** - Extract sections from lines of files.
-    ```bash
-    cut -d',' -f1 file.csv  # Extract the first field from a CSV
-    ```
-20. **`sort`** - Sort lines of text files.
-    ```bash
-    sort file.txt
-    sort -r file.txt  # Sort in reverse order
     ```
 
 ---
@@ -121,10 +82,7 @@
     ```bash
     top
     ```
-25. **`htop`** - Interactive process viewer (install with `sudo apt install htop`).
-    ```bash
-    htop
-    ```
+   
 26. **`ps`** - Display running processes.
     ```bash
     ps aux
@@ -141,11 +99,6 @@
     ```bash
     who
     ```
-30. **`w`** - Show who is logged in and what they are doing.
-    ```bash
-    w
-    ```
-
 ---
 
 ### **4. Networking**
@@ -241,10 +194,6 @@
   ```bash
   tar -cvf archive.tar /path/to/files  # Create archive
   tar -xvf archive.tar  # Extract archive
-  ```
-- **`cron`** - Schedule tasks.
-  ```bash
-  crontab -e  # Edit cron jobs
   ```
 - **`systemctl`** - Manage system services.
   ```bash
@@ -359,40 +308,7 @@ drwxr-xr-x 2 user user 4096 Mar 20 10:05 Documents
 
 ---
 
-### **3️⃣ Symbolic (Soft) Links (`l`)**  
-A **shortcut** or reference to another file or directory.  
 
-📌 **Example:**  
-- `ln -s /var/www/html mywebsite`
-  - Creates a symbolic link `mywebsite` pointing to `/var/www/html`
-
-🔹 **Command to check symbolic links:**  
-```bash
-ls -l
-```
-🔹 **Example output:**  
-```
-lrwxrwxrwx 1 user user 12 Mar 20 10:10 mylink -> /var/www/html
-```
-(`l` at the beginning indicates a **symbolic link**.)
-
----
-
-### **4️⃣ Special Device Files (Character & Block)**
-Linux represents hardware devices as files under `/dev/`.
-
-📌 **Character Device (`c`)**  
-- Used for devices that **transfer data character by character**.  
-  - Example: `/dev/tty` (terminal), `/dev/random` (random number generator)
-
-📌 **Block Device (`b`)**  
-- Used for devices that **transfer data in blocks**.  
-  - Example: `/dev/sda` (hard disk), `/dev/loop0` (loop device)
-
-🔹 **Command to check device files:**  
-```bash
-ls -l /dev
-```
 
 ### **Summary Table of Linux File Types**  
 
@@ -400,7 +316,6 @@ ls -l /dev
 |--------------|----------|--------------------------------|
 | Regular File  | `-`        | `file.txt`, `script.sh`        |
 | Directory File  | `d`        | `/home/user`, `/etc/`         |
-| Symbolic Link  | `l`        | `mylink -> /var/www/html`    |
 
 ### **`sudo` vs `su -` in Linux**  
 
@@ -486,46 +401,7 @@ lrwxrwxrwx 1 user user   10 Mar 21 12:00 link1.txt -> file1.txt
 
 ---
 
-### **2️⃣ Hard Link**  
-🔹 A **duplicate reference** to the original file.  
-🔹 If the original file is **deleted**, the hard link **still works** because it points to the same **inode**.  
-🔹 Cannot link to **directories** or files across **different file systems**.  
-🔹 Created using:  
-```bash
-ln target_file hard_link_name
-```
 
-📌 **Example:**  
-```bash
-ln /home/user/file1.txt hardlink1.txt
-ls -li
-```
-**Output:**  
-```
-123456 -rw-r--r-- 2 user user 100 Mar 21 12:00 file1.txt
-123456 -rw-r--r-- 2 user user 100 Mar 21 12:00 hardlink1.txt
-```
-✅ Provides **redundancy** (if original is deleted, data is not lost).  
-✅ More **efficient** (no extra storage for link).  
-
----
-
-### **Key Differences Table**
-
-| Feature       | Soft Link (Symbolic) | Hard Link |
-|--------------|---------------------|-----------|
-| Type         | Shortcut (pointer)  | Duplicate reference |
-| Inode        | **Different** inode from original | **Same** inode as original |
-| Cross Filesystem | ✅ Allowed | ❌ Not allowed |
-| Can Link Directories | ✅ Yes | ❌ No |
-| Survives Original Deletion | ❌ No (becomes broken) | ✅ Yes |
-| Space Usage  | **Minimal** (just a reference) | **Same as original file** |
-
----
-
-### **When to Use What?**
-🔹 **Soft Links** → For **shortcuts, linking across file systems, and linking directories**.  
-🔹 **Hard Links** → For **file backup, maintaining data even if the original is deleted**.  
 
 ## **Package Managers: `yum`, `apt`, and `dnf`**
 Package managers are used to install, update, and manage software packages in Linux.
@@ -555,26 +431,6 @@ yum search nginx
 
 ---
 
-### **2️⃣ `dnf` (Dandified YUM)**
-📌 **Used in:** RHEL 8+, CentOS 8+, Fedora 22+  
-📌 **Faster and more efficient than `yum`**  
-📌 **Example Commands:**
-```bash
-# Install a package
-sudo dnf install httpd -y
-
-# Remove a package
-sudo dnf remove httpd -y
-
-# Update all packages
-sudo dnf update -y
-
-# List installed packages
-dnf list installed
-
-# Search for a package
-dnf search nginx
-```
 
 ---
 
