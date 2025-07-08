@@ -363,4 +363,68 @@ Microservice
 * **Asynchronous (RabbitMQ/Kafka/etc.)** is ideal for decoupling, scaling, and resilient microservices
 * The choice depends on performance needs, fault tolerance requirements, and architecture style (e.g., event-driven vs. request-response)
 
+--
+# 🛡️ Fault Tolerance in Microservices
+
+---
+
+## ✅ Definition
+
+**Fault tolerance** refers to a system's ability to **continue functioning correctly** even when one or more components fail or behave unexpectedly.
+
+The goal is to ensure **high availability**, **reliability**, and a **graceful degradation** of services under failure conditions.
+
+![image](https://github.com/user-attachments/assets/a06b3278-8e49-47f8-9570-5f8f2a2f5814)
+
+![image](https://github.com/user-attachments/assets/de9927c1-059e-405c-a8dc-333929d06b02)
+
+
+---
+
+## 🔄 Key Technique: Circuit Breakers
+
+### 🔌 What is a Circuit Breaker?
+
+A **circuit breaker** is a design pattern used to detect and handle service failures.
+
+### ⚙️ How It Works:
+
+1. The circuit is **closed** during normal operation—requests flow freely.
+2. If **errors exceed a threshold** (e.g., 5 failures in 10 seconds), the circuit switches to **open state**.
+3. In the **open state**, all requests are immediately rejected (fail-fast) to prevent system overload.
+4. After a timeout, the circuit enters a **half-open** state, allowing limited requests to test if recovery has occurred.
+5. If responses are successful, it **closes** again; otherwise, it **reopens**.
+
+   ![image](https://github.com/user-attachments/assets/b1321ad8-c5b7-445e-b40c-aeeb67c31987)
+
+
+### 🎯 Benefits:
+
+* Prevents cascading failures
+* Protects resources by failing fast
+* Allows automatic recovery without manual intervention
+
+---
+
+## 🛠️ Common Libraries & Tools
+
+* **Resilience4j** (Java)
+* **Polly** (.NET)
+* **Hystrix** (Netflix - deprecated)
+* **Istio** (Service mesh with circuit breaker config)
+
+---
+
+## ✅ Summary
+
+Fault tolerance is essential for building **resilient microservices**. Circuit breakers are one of the most effective patterns to prevent minor faults from becoming systemic failures.
+
+Use them in tandem with:
+
+* Retry logic
+* Timeouts
+* Fallback strategies
+* Bulkheads
+
+To ensure your system stays stable under stress.
 
