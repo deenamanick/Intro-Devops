@@ -516,4 +516,60 @@ To ensure your system stays stable under stress.
 | Centralized | Shared cache for multiple microservices | Easy to deploy but less resilient    |
 | Distributed | Scalable, high-availability systems     | High performance but complex setup   |
 
+---
+# 🚪 Introduction to API Gateway
+
+---
+
+## 📌 What is an API Gateway?
+
+An **API Gateway** acts as a **mediator** between clients and backend microservices. It handles **request routing**, **composition**, and **protocol translation**, providing a single entry point into a system of microservices.
+
+It also facilitates **service-to-service communication** by managing internal traffic and abstracting service endpoints.
+
+![image](https://github.com/user-attachments/assets/912f0bac-fabc-494c-9d3d-33331158d7be)
+
+![image](https://github.com/user-attachments/assets/692721b2-0b3c-40c2-bf2b-6dec111f4369)
+
+![image](https://github.com/user-attachments/assets/fe0ce98b-9caf-49bc-b115-80e50472d51c)
+
+---
+
+## ✅ Advantages of API Gateway
+
+### 1. 🔄 Simplified Client Interaction
+
+* Clients interact with **one unified endpoint**, not multiple service URLs.
+* The gateway **abstracts the complexity** of service discovery and microservice distribution.
+
+### 2. 🛡️ Centralized Security
+
+* **Authentication and Authorization** can be enforced in a centralized way.
+* Reduces duplication of security logic across microservices.
+* Protects internal services from direct exposure.
+
+### 3. 📦 Cross-Cutting Concerns
+
+* Centralizes shared responsibilities:
+
+  * **Load balancing**
+  * **Rate limiting**
+  * **Caching**
+  * **Logging and Monitoring**
+  * **Request/Response transformation**
+  * **Protocol bridging (e.g., HTTP ↔ WebSocket/gRPC)**
+
+---
+
+## 🛠️ Common API Gateway Tools
+
+* **Kong**
+* **NGINX**
+* **AWS API Gateway**
+* **Azure API Management**
+* **Istio (with Envoy Proxy)**
+* **Spring Cloud Gateway (Java)**
+
+---
+
 
