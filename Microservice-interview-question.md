@@ -571,5 +571,73 @@ It also facilitates **service-to-service communication** by managing internal tr
 * **Spring Cloud Gateway (Java)**
 
 ---
+# 📨 Introduction to RabbitMQ
+
+---
+
+## 📌 What is RabbitMQ?
+
+RabbitMQ is an **open-source message broker** that enables **asynchronous communication** between microservices. It facilitates **indirect message passing** using message queues, allowing services to communicate **without being tightly coupled**.
+
+![image](https://github.com/user-attachments/assets/5c7cc13b-f396-413b-bfaf-c293cbc3be70)
+
+---
+
+## 📚 Terminology
+
+### 🧾 Producer / Publisher Microservice
+
+* Publishes messages to an **Exchange**.
+
+### 🔁 Exchange
+
+* Responsible for **routing messages** to appropriate queues based on defined **bindings**.
+
+### 🔗 Bindings
+
+* Define the **relationship between routing keys and queues**.
+* Determine **how messages flow** from an exchange to queues.
+
+### 📥 Message Queues
+
+* Temporarily **store messages** until they are consumed by a consumer.
+
+### 📤 Consumer Microservices
+
+* Read and **process messages** from the queues.
+
+---
+
+## 🔀 Types of RabbitMQ Exchanges
+
+### 📢 Fanout Exchange
+
+* **Broadcasts messages** to **all queues** bound to it.
+* Ignores routing keys.
+* Use case: **notifications, event broadcasting**.
+
+### 🎯 Direct Exchange
+
+* Delivers messages to **queues with a routing key that exactly matches** the binding key.
+* Use case: **task routing with exact match keys**.
+
+### 🧾 Headers Exchange
+
+* Routes messages based on **message headers (metadata)** instead of routing keys.
+* Use case: **complex routing logic based on multiple criteria**.
+
+### 🧵 Topic Exchange
+
+* Uses **pattern matching** with wildcards:
+
+  * `*` = matches exactly one word
+  * `#` = matches zero or more words
+* Use case: **event categorization and flexible routing** (e.g., logs.app.error, logs.db.\*).
+
+---
+
+## 📝 Summary
+
+RabbitMQ helps implement **loose coupling**, **scalability**, and **fault tolerance** in microservices architectures. Choosing the right **exchange type** depends on your message routing strategy and the level of flexibility required.
 
 
