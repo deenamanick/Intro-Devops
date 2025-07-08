@@ -552,36 +552,6 @@ source ~/.bashrc  # Reloads shell configuration without logging out
 
 ---
 
-### **2️⃣ Shell Scripting (`.sh` scripts)**
-📌 **Definition**:  
-- Shell scripting is writing a series of commands in a file (`.sh`) to automate tasks in Linux.
-
-📌 **Basic Script Example (`script.sh`)**
-```bash
-#!/bin/bash
-echo "Hello, $USER!"
-date
-```
-📌 **Making the script executable:**
-```bash
-chmod +x script.sh
-```
-📌 **Running the script:**
-```bash
-./script.sh  # Runs in a new shell
-source script.sh  # Runs in the current shell
-```
-
----
-
-### **3️⃣ Key Differences: `source` vs `sh` vs `./script.sh`**
-| Command | Effect |
-|---------|--------|
-| `source script.sh` | Runs the script in the **same shell**, so variables and changes persist. |
-| `sh script.sh` | Runs the script in a **new shell**, changes do not persist. |
-| `./script.sh` | Runs the script in a new shell, but requires execute permission (`chmod +x`). |
-
-Would you like more scripting examples? 🚀
 
 ---
 
