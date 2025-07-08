@@ -428,3 +428,92 @@ Use them in tandem with:
 
 To ensure your system stays stable under stress.
 
+--
+# ⚡ Types of Caching in Distributed Systems
+
+![image](https://github.com/user-attachments/assets/bd81aea9-5cca-4146-b8d3-25bbad4eeed3)
+
+
+---
+
+## 1. 🧠 In-Memory Caching
+
+### 📦 Storage:
+
+* Data is stored in the **RAM** of the application server or instance.
+
+### ✅ When to Use:
+
+* For **frequently accessed data** that does not need to persist beyond the application's lifetime.
+* Ideal for **read-heavy** operations within a single instance.
+
+### ✅ Advantages:
+
+* **Speed:** Extremely low latency as data is served from memory.
+* **Simplicity:** Easy to implement and tightly coupled with the application logic.
+
+### ⚠️ Problems:
+
+* **Limited Size:** Constrained by available RAM; not suitable for large datasets.
+* **No Persistence:** Cache is lost on app restarts or crashes.
+
+---
+
+## 2. 🧩 Centralized Caching
+
+### 📦 Storage:
+
+* Uses a **shared cache server** (e.g., Redis or Memcached) accessed by multiple app instances.
+
+### ✅ When to Use:
+
+* When **multiple services or instances** need to share cached data.
+* Helps **reduce redundant DB calls** and duplicate processing.
+
+### ✅ Advantages:
+
+* **Shared Access:** Allows multiple microservices to use the same cached data.
+* **Resource Efficiency:** Reduces computation and improves throughput.
+
+### ⚠️ Problems:
+
+* **Single Point of Failure:** If the central cache fails, all clients are impacted.
+* **Bottlenecks:** Can become a performance hotspot under high load.
+
+---
+
+## 3. 🌐 Distributed Caching
+
+### 📦 Storage:
+
+* Cache data is **distributed across multiple nodes** on different servers.
+
+### ✅ When to Use:
+
+* For **high-traffic, scalable applications**.
+* In **geo-distributed systems** spanning multiple regions or data centers.
+
+### ✅ Advantages:
+
+* **Scalability:** Add more cache nodes to handle increased load.
+* **Performance:** Fast, localized access to data.
+
+### ⚠️ Problems:
+
+* **Complexity:** Requires advanced configuration, monitoring, and consistency handling.
+* **Operational Overhead:** Needs more robust infrastructure and orchestration.
+
+---
+
+![image](https://github.com/user-attachments/assets/8defe013-0675-4e19-8e29-7c2a9ae08c65)
+
+
+## 📝 Summary
+
+| Type        | Best For                                | Key Trade-Offs                       |
+| ----------- | --------------------------------------- | ------------------------------------ |
+| In-Memory   | Simple, single-instance apps            | Fast but volatile and memory-limited |
+| Centralized | Shared cache for multiple microservices | Easy to deploy but less resilient    |
+| Distributed | Scalable, high-availability systems     | High performance but complex setup   |
+
+
