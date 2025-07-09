@@ -314,10 +314,11 @@ Often implements business logic beyond simple forwarding
 - ![image](https://github.com/user-attachments/assets/51ea10fd-04bc-493a-a3f2-011dd3431def)
 
 - API Gateways:
+  
+- This is the single entry point for all client requests.
+- It handles request routing to the appropriate microservice.
+- It's responsible for authentication (e.g., JWT-based auth), rate limiting, and potentially load balancing.
 
-- Front door for external API consumers
-
-- Handles versioning, rate limiting, authentication
 
 - Example: Amazon API Gateway, Kong
 
