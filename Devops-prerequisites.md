@@ -11,6 +11,7 @@
 ## Install Git Bash
 
 ![alt text](image-5.png)
+
 Git website: "https://git-scm.com/downloads/win"
 
 Then click the "Download for Windows"  button.
@@ -26,7 +27,10 @@ Run the installer by "Double-Clicking" it
 Start the setup process by Clicking "Next"
 
 ![alt text](image-3.png)
-In the process of set uping  At "CHOOSING SSH EXECUTABLE" CLICK "USE EXTERNAL OPENSSH"
+
+
+In the process of set uping  At "CHOOSING SSH EXECUTABLE" 
+CLICK "USE EXTERNAL OPENSSH"
 
 Then "SET UP THE CONFIGURATION" by keeping every thing DEFAULT then click "Next" for all Following terms
 At the End click the install Button 
@@ -133,6 +137,11 @@ cd  ubuntu
 ```
 ```
 vagrant init bento/ubuntu-24.04 
+
+```
+
+```
+vagrant up
 
 ```
 
