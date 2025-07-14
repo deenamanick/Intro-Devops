@@ -1,4 +1,4 @@
-# DevOps Class Prerequisites
+# DevOps Class Prerequisites for Windows
 
 ![alt text](image-11.png)
 
