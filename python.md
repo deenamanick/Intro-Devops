@@ -1,4 +1,4 @@
-# Python in DevOps
+# Python in DevOps for beginers
 
 Highlight why Python has become a go-to scripting language for DevOps
 engineers. Its simplicity, flexibility, and vast ecosystem of libraries make it ideal for
