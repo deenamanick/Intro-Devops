@@ -48,6 +48,20 @@ docker stop mysql2
 docker run -d -v /opt/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=db_pass123 -p 3308:3306 --name mysql3 mysql
 docker exec mysql3 mysql -pdb_pass123 -e 'use sat;select * from student'
 ```
+## Note
+
+vagrant@devops-lab:~$ docker exec mysql2 mysql -pdb_pass123 -e 'show databases'
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+
+if you get this error, make sure to use 
+
+```
+vagrant@devops-lab:~$ docker exec -it mysql2 bash
+bash-5.1# mysql -u root -p
+Enter password: 
+
+```
 
 ```
 
