@@ -30,9 +30,9 @@ docker top <container_name>                    # View running processes
 
 ### 🔹 Working with Volumes - Try this steps only on Vagrant Ubunut Linux 
 ```bash
-• cd /opt
-• mkdir data
-• cd data
+cd /opt
+mkdir data
+cd data
 docker run -d -v /opt/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=db_pass123 -p 3307:3306 --name mysql2 mysql
 docker exec mysql2 mysql -pdb_pass123 -e 'show databases'
 docker exec mysql2 mysql -pdb_pass123 -e 'use mysql;show tables'
