@@ -206,7 +206,7 @@ networks:
 ```
 
 ```bash
-docker-compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml up --build -d
 
 ## Verification
 http://localhost:80
