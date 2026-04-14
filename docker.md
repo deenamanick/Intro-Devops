@@ -117,6 +117,8 @@ docker image inspect my_image                 # Detailed image info
 docker network inspect bridge                 # Inspect default network
 docker run --network=none <image>             # No network access
 docker run --dns 8.8.8.8 <image>             # Custom DNS
+docker network inspect <name> -f '{{json .IPAM.Config}}'	Filter Subnet: Extracts only the IP Address Management (IPAM) configuration.
+docker network inspect <name> -f '{{json .Containers}}'	List Connected: Shows only the containers currently attached to that network.
 ```
 
 ### 🔸 Docker Compose (Production-Ready)
