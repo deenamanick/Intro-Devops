@@ -141,3 +141,57 @@
 100. **The DevOps Goal:** Write a paragraph on how networking knowledge helps you automate infrastructure.
 
 ---
+
+
+
+---
+
+### Task 1: The Office Network Design (Beginner)
+
+**Scenario:** A local startup has moved into a new building. They have been given the IP range **`192.168.10.0/24`** by their ISP. They need you to divide this single network into 3 separate departments while keeping room for growth.
+
+* **Requirements:**
+1. **HR & Finance:** Needs exactly 30 host IPs.
+2. **Sales & Marketing:** Needs exactly 60 host IPs.
+3. **IT & Admins:** Needs exactly 10 host IPs.
+
+
+* **Student Deliverables:**
+* What is the custom subnet mask for each department?
+* List the **Network ID**, **Usable IP Range**, and **Broadcast ID** for all 3 subnets.
+
+
+
+---
+
+### Task 2: Cloud 2-Tier Architecture (Intermediate)
+
+**Scenario:** You are deploying a standard web application in the cloud (AWS/Azure). Your allocated Cloud network block is **`10.0.0.0/16`**. You must design a highly secure, multi-tier infrastructure.
+
+* **Requirements:**
+1. Create a **Public Subnet** for the Frontend Web Servers that can talk to the internet. It needs to support up to 250 public-facing instances.
+2. Create a **Private Subnet** for the Backend Database. This must be completely isolated from the internet. It needs to support up to 500 database instances.
+
+
+* **Student Deliverables:**
+* Calculate the appropriate CIDR notation (e.g., `/24`, `/23`) for both subnets using VLSM (Variable Length Subnet Masking).
+* Provide the Subnet Mask and the starting/ending IP addresses for both tiers.
+
+
+
+---
+
+### Task 3: The Untrusted IoT Lab (Hands-on / Advanced)
+
+**Scenario:** You are setting up a smart lab environment. You have a central server (or a Raspberry Pi) hosting private files, but you also need to connect 20 smart bulbs and IP cameras that are prone to security vulnerabilities. You are using the private space **`172.16.0.0/24`**.
+
+* **Requirements:**
+1. Divide the network into two equal halves.
+2. **Subnet A** will be for Trusted Secure Servers.
+3. **Subnet B** will be an isolated "Untrusted IoT" zone.
+
+
+* **Student Deliverables:**
+* Determine the subnet mask needed to split this network perfectly in half.
+* State the Network ID and Gateway IP for both Subnets.
+* **Bonus Question:** Write down a simple firewall logic rule (Source Subnet, Destination Subnet, Action) to prevent an infected smart bulb in Subnet B from accessing a server in Subnet A.
