@@ -1,8 +1,6 @@
-# 🚀 50 Scenario-Based Git Interview & Practice Questions
+# 🚀 65 Scenario-Based Git Interview & Practice Questions
 
 A comprehensive collection of real-world Git scenarios, commands, and practical examples for DevOps engineers, developers, and system administrators.
-
----
 
 ### 🔰 **Basic Repository & Commit Scenarios**
 
@@ -754,3 +752,209 @@ A comprehensive collection of real-world Git scenarios, commands, and practical 
     ```
 
 ---
+
+### 🧩 **Additional Important Git Scenarios**
+
+51. **Scenario: You checked out a commit hash to investigate an old release, and Git says you are in a detached HEAD state.**
+    
+    ➤ *Goal:* Preserve any work made from the detached commit by creating a branch.
+    
+    ➤ *Command:* `git switch -c investigate-release`
+    
+    *Example:*
+    ```bash
+    git switch --detach v1.4.0
+    git switch -c hotfix-from-v1.4.0
+    ```
+
+52. **Scenario: Your local branch and the remote branch have diverged, and you want to choose how `git pull` integrates changes.**
+    
+    ➤ *Goal:* Make the pull strategy explicit.
+    
+    ➤ *Command:* `git pull --rebase origin main`
+    
+    *Example:*
+    ```bash
+    git pull --rebase origin main
+    # Or create a merge commit:
+    git pull --no-rebase origin main
+    ```
+
+53. **Scenario: You rebased a private branch and need to update its remote branch safely.**
+    
+    ➤ *Goal:* Force-push only when the remote branch still contains the expected history.
+    
+    ➤ *Command:* `git push --force-with-lease origin feature/payment`
+    
+    *Example:*
+    ```bash
+    git fetch origin
+    git rebase origin/main
+    git push --force-with-lease origin feature/payment
+    ```
+
+54. **Scenario: You need to find a commit by text in its message or by a string that was added or removed.**
+    
+    ➤ *Goal:* Search repository history efficiently.
+    
+    ➤ *Command:*
+    ```bash
+    git log --all --grep="timeout" --oneline
+    git log --all -S"MAX_RETRIES" --oneline
+    ```
+    
+    *Example:*
+    ```bash
+    git log --all -S"connection refused" -- src/
+    git log --all --grep="database timeout" --regexp-ignore-case --oneline
+    ```
+
+55. **Scenario: You deleted a file in the latest commit but need to restore it from the previous commit.**
+    
+    ➤ *Goal:* Restore one file without resetting the entire branch.
+    
+    ➤ *Command:* `git restore --source=HEAD~1 -- path/to/file`
+    
+    *Example:*
+    ```bash
+    git restore --source=HEAD~1 -- config/production.yml
+    git add config/production.yml
+    git commit -m "restore production configuration"
+    ```
+
+56. **Scenario: You want to remove a file containing a secret from every commit in the repository history.**
+    
+    ➤ *Goal:* Rewrite history and rotate the exposed secret.
+    
+    ➤ *Command:* `git filter-repo --path secrets.env --invert-paths`
+    
+    *Example:*
+    ```bash
+    git filter-repo --path secrets.env --invert-paths
+    git log --all -- secrets.env
+    ```
+    > ⚠️ *Warning:* Coordinate history rewrites with collaborators and use `git push --force-with-lease` where appropriate.
+
+57. **Scenario: You want Git to ignore a file, but do not know which ignore rule matches it.**
+    
+    ➤ *Goal:* Identify the exact ignore file and rule.
+    
+    ➤ *Command:* `git check-ignore -v path/to/file`
+    
+    *Example:*
+    ```bash
+    git check-ignore -v build/output.log
+    ```
+
+58. **Scenario: You need to review only the commits that exist on `feature/api` but not on `main`.**
+    
+    ➤ *Goal:* Inspect the commit range used by a pull request.
+    
+    ➤ *Command:* `git log --oneline main..feature/api`
+    
+    *Example:*
+    ```bash
+    git log --oneline --decorate main..feature/api
+    ```
+
+59. **Scenario: You want to copy a commit from another branch, but it produces conflicts during cherry-pick.**
+    
+    ➤ *Goal:* Resolve the conflict and complete or cancel the cherry-pick.
+    
+    ➤ *Command:*
+    ```bash
+    git add <resolved-file>
+    git cherry-pick --continue
+    ```
+    
+    *Example:*
+    ```bash
+    git add src/auth.py
+    git cherry-pick --continue
+    # To abandon the operation:
+    git cherry-pick --abort
+    ```
+
+60. **Scenario: You want to save only one file's changes in a stash while continuing to work on other files.**
+    
+    ➤ *Goal:* Stash selected paths instead of the entire working tree.
+    
+    ➤ *Command:* `git stash push -m "WIP: API changes" -- src/api.py`
+    
+    *Example:*
+    ```bash
+    git stash push -m "WIP: API changes" -- src/api.py
+    git status
+    ```
+
+61. **Scenario: You need to apply a stash for inspection but want to keep it available as a backup.**
+    
+    ➤ *Goal:* Apply a stash without removing it.
+    
+    ➤ *Command:* `git stash apply stash@{0}`
+    
+    *Example:*
+    ```bash
+    git stash apply stash@{0}
+    git stash list
+    ```
+
+62. **Scenario: A repository is very large, and you need only one directory to work on a documentation change.**
+    
+    ➤ *Goal:* Use sparse checkout to limit the working tree.
+    
+    ➤ *Command:*
+    ```bash
+    git sparse-checkout init --cone
+    git sparse-checkout set docs
+    ```
+    
+    *Example:*
+    ```bash
+    git clone https://github.com/example/large-project.git
+    cd large-project
+    git sparse-checkout init --cone
+    git sparse-checkout set docs website
+    ```
+
+63. **Scenario: You need to inspect exactly what changed in a commit before approving it.**
+    
+    ➤ *Goal:* Review a commit's metadata and patch.
+    
+    ➤ *Command:* `git show --stat --patch <commit>`
+    
+    *Example:*
+    ```bash
+    git show --stat --patch 4f8b21c
+    ```
+
+64. **Scenario: A commit was created with the wrong author identity, and it has not been shared yet.**
+    
+    ➤ *Goal:* Correct the author on the latest local commit.
+    
+    ➤ *Command:*
+    ```bash
+    git commit --amend --author="Correct Name <correct.email@example.com>" --no-edit
+    ```
+    
+    *Example:*
+    ```bash
+    git commit --amend --author="Asha Dev <asha@example.com>" --no-edit
+    git log -1 --format=fuller
+    ```
+    > ⚠️ *Warning:* Amending changes the commit ID, so coordinate before rewriting a pushed commit.
+
+65. **Scenario: You want to make sure a branch contains the latest release commit before deploying it.**
+    
+    ➤ *Goal:* Verify whether one commit is an ancestor of another.
+    
+    ➤ *Command:* `git merge-base --is-ancestor v2.0.0 production`
+    
+    *Example:*
+    ```bash
+    if git merge-base --is-ancestor v2.0.0 production; then
+      echo "production contains v2.0.0"
+    else
+      echo "production does not contain v2.0.0"
+    fi
+    ```
