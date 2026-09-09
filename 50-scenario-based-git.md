@@ -1,6 +1,237 @@
-# 🚀 50 Scenario-Based Git Interview & Practice Questions
+# 🚀 65 Scenario-Based Git Interview & Practice Questions
 
 A comprehensive collection of real-world Git scenarios, commands, and practical examples for DevOps engineers, developers, and system administrators.
+
+---
+
+### 🧩 **Additional Important Git Scenarios**
+
+51. **Scenario: You checked out a commit hash to investigate an old release, and Git says you are in a detached HEAD state.**
+    
+    ➤ *Goal:* Preserve any work made from the detached commit by creating a branch.
+    
+    ➤ *Command:*
+    ```bash
+    git switch -c investigate-release
+    ```
+    
+    *Example:*
+    ```bash
+    git switch --detach v1.4.0
+    # Inspect or test the old release
+    git switch -c hotfix-from-v1.4.0
+    # Your future commits now belong to a named branch
+    ```
+
+52. **Scenario: Your local branch and the remote branch have diverged, and you want to choose how `git pull` integrates changes.**
+    
+    ➤ *Goal:* Make the pull strategy explicit instead of relying on an implicit default.
+    
+    ➤ *Command:*
+    ```bash
+    git pull --rebase origin main
+    ```
+    
+    *Example:*
+    ```bash
+    # Reapply your local commits on top of the updated remote branch:
+    git pull --rebase origin main
+    # Or create a merge commit instead:
+    git pull --no-rebase origin main
+    ```
+
+53. **Scenario: You rebased a private branch and need to update its remote branch without overwriting a teammate's newer work.**
+    
+    ➤ *Goal:* Force-push only when the remote branch still contains the expected history.
+    
+    ➤ *Command:* `git push --force-with-lease origin feature/payment`
+    
+    *Example:*
+    ```bash
+    git fetch origin
+    git rebase origin/main
+    git push --force-with-lease origin feature/payment
+    # The push is rejected if someone else updated the remote branch
+    ```
+
+54. **Scenario: You need to find a commit by text in its commit message or by a string that was added or removed.**
+    
+    ➤ *Goal:* Search repository history efficiently.
+    
+    ➤ *Command:*
+    ```bash
+    git log --all --grep="timeout" --oneline
+    git log --all -S"MAX_RETRIES" --oneline
+    ```
+    
+    *Example:*
+    ```bash
+    # Find commits that changed the exact string:
+    git log --all -S"connection refused" -- src/
+    # Find commits whose messages mention a database timeout:
+    git log --all --grep="database timeout" --regexp-ignore-case --oneline
+    ```
+
+55. **Scenario: You deleted a file in the latest commit but need to restore it from the previous commit.**
+    
+    ➤ *Goal:* Restore a file from a specific revision without resetting the entire branch.
+    
+    ➤ *Command:* `git restore --source=HEAD~1 -- path/to/file`
+    
+    *Example:*
+    ```bash
+    git restore --source=HEAD~1 -- config/production.yml
+    git add config/production.yml
+    git commit -m "restore production configuration"
+    ```
+
+56. **Scenario: You want to remove a file containing a secret from every commit in the repository history.**
+    
+    ➤ *Goal:* Rewrite history with a purpose-built history-rewriting tool, then rotate the exposed secret.
+    
+    ➤ *Command:*
+    ```bash
+    git filter-repo --path secrets.env --invert-paths
+    ```
+    
+    *Example:*
+    ```bash
+    # Remove the file from all refs, then verify:
+    git filter-repo --path secrets.env --invert-paths
+    git log --all -- secrets.env
+    # Rotate the credential before force-pushing rewritten branches
+    ```
+    > ⚠️ *Warning:* Coordinate the history rewrite with all collaborators and use `git push --force-with-lease` where appropriate.
+
+57. **Scenario: You want Git to ignore a file, but you do not know which ignore rule is matching it.**
+    
+    ➤ *Goal:* Identify the exact ignore file and rule responsible.
+    
+    ➤ *Command:* `git check-ignore -v path/to/file`
+    
+    *Example:*
+    ```bash
+    git check-ignore -v build/output.log
+    # .gitignore:12:*.log    build/output.log
+    ```
+
+58. **Scenario: You need to review only the commits that exist on `feature/api` but not on `main`.**
+    
+    ➤ *Goal:* Inspect the commit range used by a pull request.
+    
+    ➤ *Command:* `git log --oneline main..feature/api`
+    
+    *Example:*
+    ```bash
+    git log --oneline --decorate main..feature/api
+    # Lists commits reachable from feature/api and not reachable from main
+    ```
+
+59. **Scenario: You want to copy a commit from another branch, but it produces conflicts during cherry-pick.**
+    
+    ➤ *Goal:* Resolve the conflict and either complete or cancel the cherry-pick.
+    
+    ➤ *Command:*
+    ```bash
+    git add <resolved-file>
+    git cherry-pick --continue
+    ```
+    
+    *Example:*
+    ```bash
+    # After resolving conflict markers:
+    git add src/auth.py
+    git cherry-pick --continue
+    # To abandon the operation instead:
+    git cherry-pick --abort
+    ```
+
+60. **Scenario: You want to save only one file's changes in a stash while continuing to work on other files.**
+    
+    ➤ *Goal:* Stash selected paths instead of the entire working tree.
+    
+    ➤ *Command:* `git stash push -m "WIP: API changes" -- src/api.py`
+    
+    *Example:*
+    ```bash
+    git stash push -m "WIP: API changes" -- src/api.py
+    git status
+    # Changes in other paths remain in the working directory
+    ```
+
+61. **Scenario: You need to apply a stash for inspection but want to keep it available as a backup.**
+    
+    ➤ *Goal:* Apply a stash without removing it from the stash list.
+    
+    ➤ *Command:* `git stash apply stash@{0}`
+    
+    *Example:*
+    ```bash
+    git stash apply stash@{0}
+    git stash list
+    # The stash remains available; drop it only after verifying the result
+    ```
+
+62. **Scenario: A repository is very large, and you need only one directory to work on a documentation change.**
+    
+    ➤ *Goal:* Use sparse checkout to limit the working tree.
+    
+    ➤ *Command:*
+    ```bash
+    git sparse-checkout init --cone
+    git sparse-checkout set docs
+    ```
+    
+    *Example:*
+    ```bash
+    git clone https://github.com/example/large-project.git
+    cd large-project
+    git sparse-checkout init --cone
+    git sparse-checkout set docs website
+    ```
+
+63. **Scenario: You need to inspect exactly what changed in a commit before approving it.**
+    
+    ➤ *Goal:* Review a commit's metadata and patch together.
+    
+    ➤ *Command:* `git show --stat --patch <commit>`
+    
+    *Example:*
+    ```bash
+    git show --stat --patch 4f8b21c
+    # Displays the commit message, changed files, and line-by-line patch
+    ```
+
+64. **Scenario: A commit was created with the wrong author identity, and it has not been shared yet.**
+    
+    ➤ *Goal:* Correct the author on the latest local commit.
+    
+    ➤ *Command:*
+    ```bash
+    git commit --amend --author="Correct Name <correct.email@example.com>" --no-edit
+    ```
+    
+    *Example:*
+    ```bash
+    git commit --amend --author="Asha Dev <asha@example.com>" --no-edit
+    git log -1 --format=fuller
+    ```
+    > ⚠️ *Warning:* Amending changes the commit ID, so coordinate before rewriting a commit already pushed for others to use.
+
+65. **Scenario: You want to make sure a branch contains the latest release commit before deploying it.**
+    
+    ➤ *Goal:* Verify whether one commit is an ancestor of another.
+    
+    ➤ *Command:* `git merge-base --is-ancestor v2.0.0 production`
+    
+    *Example:*
+    ```bash
+    if git merge-base --is-ancestor v2.0.0 production; then
+      echo "production contains v2.0.0"
+    else
+      echo "production does not contain v2.0.0"
+    fi
+    ```
 
 ---
 
