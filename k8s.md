@@ -97,11 +97,34 @@ Hosts containers and is controlled by the master node.
 
 ```mermaid
 graph TD
-  Deployment -->|Manages| ReplicaSet
-  ReplicaSet -->|Creates/Scales| Pod
-  Pod -->|Runs| Container1[Container]
-  Pod -->|Runs| Container2[Container]
-  Service -->|Routes Traffic to| Pod
+  subgraph Workload Controllers
+    DEP["Deployment\n(Stateless Apps)"]
+    SS["StatefulSet\n(Stateful Apps)"]
+    DS["DaemonSet\n(Every Node)"]
+  end
+
+  DEP -->|Creates & Manages| RS["ReplicaSet\n(Maintains desired Pod count)"]
+  RS -->|Creates / Scales| P1((Pod))
+  RS -->|Creates / Scales| P2((Pod))
+  RS -->|Creates / Scales| P3((Pod))
+
+  SS -->|Creates with\nstable identity| P4((Pod))
+  SS -->|Creates with\nstable identity| P5((Pod))
+
+  DS -->|Runs one copy\nper node| P6((Pod))
+
+  subgraph Pod Internals
+    PA((Pod)) -->|Runs| C1[Container 1\ne.g. NGINX]
+    PA -->|Runs| C2[Container 2\ne.g. Redis]
+  end
+
+  SVC["Service\n(Stable IP & DNS)"] -->|Routes traffic to| P1
+  SVC -->|Routes traffic to| P2
+  SVC -->|Routes traffic to| P3
+
+  DEP -.- EX1>"Web Servers\nMicroservices"]
+  SS -.- EX2>"MySQL\nMongoDB"]
+  DS -.- EX3>"Log Collectors\nMonitoring Agents"]
 ```
 
 | Object | Purpose | Use Case |
