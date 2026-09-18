@@ -95,46 +95,110 @@ Hosts containers and is controlled by the master node.
 
 ## 📦 Phase 2: Core Kubernetes Objects
 
+### 1️⃣ Pod
+The **smallest deployable unit** in Kubernetes. A Pod wraps one or more containers that share networking and storage.
+
+```mermaid
+graph LR
+  subgraph Pod
+    C1[Container 1\nNGINX]
+    C2[Container 2\nLog Sidecar]
+    V[(Shared Volume)]
+    C1 --- V
+    C2 --- V
+  end
+  NET["Shared Network\n(localhost + Pod IP)"] --- Pod
+```
+> 💡 Containers inside the same Pod communicate over `localhost` and share the same IP address.
+
+---
+
+### 2️⃣ ReplicaSet
+Ensures a **specified number of identical Pod replicas** are running at all times. If a Pod crashes, ReplicaSet creates a replacement.
+
 ```mermaid
 graph TD
-  subgraph Workload Controllers
-    DEP["Deployment\n(Stateless Apps)"]
-    SS["StatefulSet\n(Stateful Apps)"]
-    DS["DaemonSet\n(Every Node)"]
-  end
-
-  DEP -->|Creates & Manages| RS["ReplicaSet\n(Maintains desired Pod count)"]
-  RS -->|Creates / Scales| P1((Pod))
-  RS -->|Creates / Scales| P2((Pod))
-  RS -->|Creates / Scales| P3((Pod))
-
-  SS -->|Creates with\nstable identity| P4((Pod))
-  SS -->|Creates with\nstable identity| P5((Pod))
-
-  DS -->|Runs one copy\nper node| P6((Pod))
-
-  subgraph Pod Internals
-    PA((Pod)) -->|Runs| C1[Container 1\ne.g. NGINX]
-    PA -->|Runs| C2[Container 2\ne.g. Redis]
-  end
-
-  SVC["Service\n(Stable IP & DNS)"] -->|Routes traffic to| P1
-  SVC -->|Routes traffic to| P2
-  SVC -->|Routes traffic to| P3
-
-  DEP -.- EX1>"Web Servers\nMicroservices"]
-  SS -.- EX2>"MySQL\nMongoDB"]
-  DS -.- EX3>"Log Collectors\nMonitoring Agents"]
+  RS["ReplicaSet\n(desired: 3 replicas)"]
+  RS --> P1((Pod 1))
+  RS --> P2((Pod 2))
+  RS --> P3((Pod 3))
+  P3 -. crashes .-> RS
+  RS -. auto-creates .-> P4((Pod 4\nReplacement))
 ```
+> 💡 You rarely create ReplicaSets directly — **Deployments** manage them for you.
 
-| Object | Purpose | Use Case |
-| :--- | :--- | :--- |
-| **Pod** | Smallest K8s object. Represents a single instance of a running process. | Can have single or multi-containers (e.g., NGINX + Redis). |
-| **ReplicaSet** | Ensures a specified number of Pod replicas are running. | Used by Deployments. |
-| **Deployment** | Manages the deployment and scaling of Pods. | Web servers, microservices. |
-| **StatefulSet** | Manages stateful apps with stable identities and persistent storage. | Databases (MySQL, MongoDB). |
-| **DaemonSet** | Ensures a copy of a Pod runs on all (or some) nodes. | Log collection, monitoring agents. |
-| **Service** | Provides a stable IP and DNS name to access Pods. | Internal/external traffic routing. |
+---
+
+### 3️⃣ Deployment
+Manages **stateless applications**. Creates and controls ReplicaSets, and enables **rolling updates** and **rollbacks**.
+
+```mermaid
+graph TD
+  DEP[Deployment\nmy-web-app]
+  DEP -->|Creates & Manages| RS1["ReplicaSet v1"]
+  DEP -.->|Rolling Update| RS2["ReplicaSet v2 (new)"]
+  RS1 --> P1((Pod v1))
+  RS1 --> P2((Pod v1))
+  RS1 --> P3((Pod v1))
+  RS2 -.-> P4((Pod v2))
+  RS2 -.-> P5((Pod v2))
+  RS2 -.-> P6((Pod v2))
+```
+> 💡 During a rolling update, Pods in v1 are gradually replaced by v2 with **zero downtime**.
+
+---
+
+### 4️⃣ StatefulSet
+Manages **stateful applications** that need **stable network identity** and **persistent storage** (e.g., databases).
+
+```mermaid
+graph TD
+  STS[StatefulSet\nmy-database]
+  STS --> P0["Pod: db-0\n(Primary)"]
+  STS --> P1["Pod: db-1\n(Replica)"]
+  STS --> P2["Pod: db-2\n(Replica)"]
+  P0 --- PV0[(PV: disk-0)]
+  P1 --- PV1[(PV: disk-1)]
+  P2 --- PV2[(PV: disk-2)]
+```
+> 💡 Each Pod gets a **predictable name** (`db-0`, `db-1`, `db-2`) and its **own persistent volume** that survives restarts.
+
+---
+
+### 5️⃣ DaemonSet
+Ensures **one copy of a Pod runs on every node** (or a subset). Perfect for cluster-wide agents.
+
+```mermaid
+graph TD
+  DS[DaemonSet\nlog-collector]
+  subgraph Node 1
+    P1((Pod))
+  end
+  subgraph Node 2
+    P2((Pod))
+  end
+  subgraph Node 3
+    P3((Pod))
+  end
+  DS --> P1
+  DS --> P2
+  DS --> P3
+```
+> 💡 When a new node joins the cluster, the DaemonSet **automatically** schedules a Pod on it.
+
+---
+
+### 6️⃣ Service
+Provides a **stable IP address and DNS name** to access a group of Pods. Pods may come and go, but the Service endpoint stays constant.
+
+```mermaid
+graph LR
+  Client((Client)) -->|Requests| SVC["Service\n(Stable IP: 10.0.0.50)"]
+  SVC -->|Load Balances| P1((Pod 1\n10.1.0.2))
+  SVC -->|Load Balances| P2((Pod 2\n10.1.0.3))
+  SVC -->|Load Balances| P3((Pod 3\n10.1.0.4))
+```
+> 💡 The Service **load-balances** traffic across healthy Pods. If a Pod dies and is replaced, the Service routes to the new Pod automatically.
 
 ---
 
