@@ -20,13 +20,13 @@ Before diving into specific vulnerabilities, students must understand the core p
 
 ```mermaid
 graph LR
-  subgraph Traditional Approach (Shift-Right)
+  subgraph Trad ["Traditional Approach (Shift-Right)"]
     direction LR
     T1[Write Code] --> T2[Build] --> T3[Test] --> T4[Deploy] --> T5[Security Audit<br>Too Late & Expensive!]
     style T5 fill:#f87171,color:#fff
   end
   
-  subgraph Shift-Left Approach
+  subgraph ShiftLeft ["Shift-Left Approach"]
     direction LR
     S1[Security<br>Design] --> S2[Write Code<br>IDE Scan] --> S3[Build<br>SAST/SCA] --> S4[Test<br>DAST] --> S5[Deploy<br>Safely]
     style S1 fill:#4ade80,color:#fff
