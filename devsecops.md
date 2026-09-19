@@ -75,6 +75,172 @@ The main workflow runs ZAP Baseline **after deployment**, including production. 
 | A09 Security Logging and Monitoring Failures | Controlled security tests; operational monitoring | Application audit events, alert routing and response |
 | A10 Server-Side Request Forgery | Semgrep; targeted dynamic tests | Destination restrictions and network controls |
 
+### 2.1. What are the equivalents in industry?
+
+The tools in this course already belong to industry security categories. Semgrep, ZAP, Gitleaks and OSV-Scanner are practical tools, not merely classroom simulations. In larger environments, teams may add centralized policies, reporting, identity integration, inventory and remediation tracking.
+
+Here, **equivalent means serving a similar purpose**, not identical features or a drop-in replacement. Some entries below are complementary controls: a secrets manager does not replace a secrets scanner, and an identity provider does not replace application authorization checks. Product coverage depends on configuration, supported languages, edition and deployment model.
+
+| Course control | Industry term | Comparable tools or practices | Important distinction |
+|---|---|---|---|
+| Semgrep | Static Application Security Testing (SAST) | GitHub CodeQL; SonarQube security analysis | Rules, language coverage and analysis depth differ |
+| ZAP | Dynamic Application Security Testing (DAST) | Burp Suite DAST; authenticated application penetration testing | Passive scanning, active scanning and human testing have different coverage |
+| Gitleaks | Secret detection / secret scanning | GitHub secret scanning | Detection does not store, rotate or revoke credentials |
+| OSV-Scanner | Software Composition Analysis (SCA) | Snyk Open Source; dependency vulnerability analysis | SCA examines third-party components; SAST examines application code |
+| Dependabot | Automated dependency maintenance | Dependency update PRs followed by testing and release | Opening a PR does not patch deployed software |
+| CODEOWNERS and review | Secure SDLC governance / security design review | Required approvals, threat modeling and security acceptance criteria | Review ownership must be backed by enforceable repository rules |
+| Runner hardening | CI/CD security / build environment hardening | Isolated runners, least-privilege tokens and outbound access policies | Protecting CI does not harden the deployed application |
+| Artifact provenance | Software supply chain security | GitHub artifact attestations; Sigstore Cosign verification | Trust requires verification of artifact digest and signer or builder identity |
+| Application logs and alerts | Security monitoring / detection engineering | A SIEM such as Microsoft Sentinel; response procedures | Collecting logs alone does not guarantee detection or response |
+| Configuration review | Infrastructure as Code (IaC) security | Checkov for supported IaC formats | Static infrastructure checks complement runtime application testing |
+
+Tool references: [GitHub security capabilities](https://github.com/security/advanced-security), [Sonar security analysis](https://www.sonarsource.com/solutions/security/), [Burp Suite DAST](https://portswigger.net/burp/documentation/dast), [Snyk on SCA](https://snyk.io/articles/open-source-security/software-composition-analysis-sca/), [Cosign verification](https://docs.sigstore.dev/cosign/verifying/verify/), [Microsoft Sentinel](https://learn.microsoft.com/en-us/azure/sentinel/overview), and [Checkov](https://www.checkov.io/1.Welcome/What%20is%20Checkov.html).
+
+### 2.2. Teaching each row as an industry scenario
+
+For each risk, explain **what can go wrong, which control helps, who implements it, and what evidence demonstrates success**. The responsibilities below are illustrative; organizations divide them differently.
+
+#### A01: Authorization engineering and API security testing
+
+**Explain it:** Authentication asks, “Who are you?” Authorization asks, “May you perform this action on this particular resource?” A valid employee badge should not open every room in the building.
+
+**Industry vocabulary:** RBAC (Role-Based Access Control) grants permissions through roles; ABAC (Attribute-Based Access Control) evaluates attributes such as user, tenant and resource. IDOR (Insecure Direct Object Reference) and BOLA (Broken Object Level Authorization) describe related failures where changing an object identifier bypasses access restrictions.
+
+**Workplace example:** A support agent may view a ticket in their assigned tenant but cannot export every customer's tickets. The application must enforce both action permissions and tenant or object scope on the server.
+
+**Controls and equivalents:** Developers implement authorization; QA and application security engineers test a role-and-resource matrix. Semgrep or CodeQL can find selected code patterns. Configured ZAP access-control testing and manual API testing check behavior using different users. See [ZAP access-control testing](https://www.zaproxy.org/docs/desktop/addons/access-control-testing/).
+
+**Teaching evidence:** Show the same request succeeding for an owner and failing for another user. Also test an administrator-only action with an ordinary account. Hiding a button is not evidence of server-side enforcement.
+
+#### A02: Secrets management and cryptographic key management
+
+**Explain it:** Finding a key left on a desk and providing a secure key cabinet are different jobs. Gitleaks detects certain exposed credentials; secure storage and lifecycle management require additional controls.
+
+**Industry vocabulary:** Secrets management controls credentials; KMS (Key Management Service) manages cryptographic keys; rotation replaces credentials or keys; revocation stops their use. Encryption in transit protects network traffic, while encryption at rest protects stored data.
+
+**Workplace example:** A service retrieves its database credential through its workload identity, rather than storing it in Git. Access is restricted, usage is audited, and a rotation procedure updates the service safely.
+
+**Controls and equivalents:** GitHub secret scanning serves a similar detection role to Gitleaks. HashiCorp Vault provides secrets-management capabilities and key-management integrations; these complement scanning. Platform and security teams define storage, access and lifecycle policies. See [GitHub secret scanning](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning) and [Vault capabilities](https://www.hashicorp.com/en/products/vault/features).
+
+**Teaching evidence:** Demonstrate a synthetic secret finding, then show how the application receives a secret without embedding it in source or logs. Discuss how a real leaked credential would be revoked. Key rotation for encrypted data also requires a plan to retain necessary decryption access.
+
+#### A03: Secure coding, SAST and DAST
+
+**Explain it:** Injection happens when data is treated as instructions. A search term should remain a search term, even when it contains characters that have meaning in SQL or HTML.
+
+**Industry vocabulary:** A source is where untrusted data enters; a sink is a sensitive operation such as executing a query. Taint analysis follows potentially unsafe data from source to sink. Parameterized queries separate SQL instructions from values.
+
+**Workplace example:** A customer search API builds SQL using string concatenation. Developers replace it with bound parameters, add a regression test, and rerun the applicable static scan and authorized dynamic tests.
+
+**Controls and equivalents:** Semgrep, CodeQL and SonarQube provide forms of static security analysis. ZAP active scanning and Burp Suite DAST test running applications. They complement developer tests; neither can guarantee every route or data flow is covered.
+
+**Teaching evidence:** Show vulnerable code, the relevant finding, the corrected code and a test proving input remains data. Explain why a SQL fix does not automatically fix XSS or command injection.
+
+#### A04: Threat modeling and secure design review
+
+**Explain it:** An accurately built house can still be unsafe if the plan omitted door locks. Review the intended behavior before relying on scanners to inspect the implementation.
+
+**Industry vocabulary:** The Secure Software Development Lifecycle (Secure SDLC) includes security throughout planning, design, coding, testing and operations. Threat modeling considers assets, attackers, trust boundaries and abuse cases. A security acceptance criterion states a behavior that must be demonstrated before release.
+
+**Workplace example:** Before building password recovery, the team specifies token expiry, single use, rate limits and behavior that avoids revealing whether an account exists. These requirements become review items and tests.
+
+**Controls and equivalents:** CODEOWNERS supports review routing. The broader industry practice is security design review with developers, product owners and application security engineers. OWASP ASVS (Application Security Verification Standard) provides requirements for security verification; it can turn a broad Top 10 concern into testable criteria. See [OWASP ASVS](https://owasp.org/projects/asvs).
+
+**Teaching evidence:** Ask students to draw a trust boundary and write one abuse case, its mitigation and an acceptance test. A review approval should be supported by a recorded design decision.
+
+#### A05: Configuration hardening and infrastructure security
+
+**Explain it:** Secure code can be exposed by an unsafe setting: public storage, excessive permissions, verbose error pages or inappropriate HTTP headers.
+
+**Industry vocabulary:** Hardening reduces unnecessary features and access. IaC scanning checks infrastructure definitions before deployment. CSPM (Cloud Security Posture Management) evaluates cloud configuration and posture; configuration drift means the deployed state has moved away from the intended state.
+
+**Workplace example:** A Terraform change would make sensitive storage publicly accessible. An IaC policy flags the change before deployment. Runtime checks separately confirm application behavior and deployed access settings.
+
+**Controls and equivalents:** ZAP observes application responses. Checkov checks supported infrastructure definitions. Platform engineers manage runtime configuration and runner isolation. These address different surfaces; runner hardening is not a replacement for either application or infrastructure checks.
+
+**Teaching evidence:** Compare an unsafe setting, its policy finding and the corrected setting. Explain whether the check inspects source configuration, the CI runner, or the live application.
+
+#### A06: Software composition analysis and vulnerability management
+
+**Explain it:** Your application inherits risks from the libraries it uses, including indirect dependencies brought in by other libraries.
+
+**Industry vocabulary:** A direct dependency is explicitly selected; a transitive dependency arrives through another package. A CVE is an identifier for a published vulnerability. An SBOM (Software Bill of Materials) inventories software components. Vulnerability management adds prioritization, ownership, remediation and verification to discovery.
+
+**Workplace example:** A vulnerability is published for a package already deployed. The team identifies affected applications, evaluates exposure, assigns an owner, updates the dependency, tests it and confirms the fixed version is running.
+
+**Controls and equivalents:** OSV-Scanner and Snyk Open Source serve SCA needs with differing coverage. Dependabot supports update proposals. A mature process includes recurring scans, inventory and documented exceptions with review dates; a clean initial release scan is insufficient when advisories appear later.
+
+**Teaching evidence:** Have students trace an advisory to a lockfile entry, a patch PR, passing tests and a deployed version. An SBOM is an inventory, not proof that listed components are safe.
+
+#### A07: Identity and Access Management and session security
+
+**Explain it:** Checking a passport once is not enough if a stolen entry pass remains valid forever. Authentication and session controls must cover the whole login lifecycle.
+
+**Industry vocabulary:** IAM means Identity and Access Management; an IdP is an identity provider; SSO is Single Sign-On; MFA is Multi-Factor Authentication. OpenID Connect supplies an identity layer, while OAuth 2.0 is an authorization framework and is not by itself a user authentication protocol.
+
+**Workplace example:** An application delegates login to an identity provider, then validates tokens and enforces its own resource permissions. The team tests expired tokens, invalid token audience, session renewal and logout behavior.
+
+**Controls and equivalents:** An IAM platform such as Keycloak supports identity integration and SSO; it complements ZAP and authentication tests. Identity teams manage provider policies, while application developers remain responsible for correct integration and session behavior. See [Keycloak](https://www.keycloak.org/).
+
+**Teaching evidence:** Test a rejected expired credential and the configured logout or revocation behavior. Do not assume that all self-contained access tokens become invalid immediately after logout; define the intended lifetime and revocation strategy.
+
+#### A08: Software supply chain security and release verification
+
+**Explain it:** A package labeled “official release” needs evidence connecting its exact contents to the expected build process.
+
+**Industry vocabulary:** A digest identifies content; a signature binds a statement to a signing identity; provenance records build origin. An attestation is a statement about an artifact that can be authenticated. Deployment policy decides which identities and build origins are acceptable.
+
+**Workplace example:** CI builds an artifact, records provenance and signs an attestation. A deployment verifier checks the artifact digest and expected builder identity before allowing promotion. A substituted artifact or an unexpected signer is rejected.
+
+**Controls and equivalents:** Action SHA pinning restricts action references. GitHub artifact attestations and Sigstore Cosign support verifiable supply chain evidence. Build and platform teams must enforce verification; signatures are useful only when the consumer checks the correct trust policy.
+
+**Teaching evidence:** Demonstrate rejection after changing the artifact, and rejection of evidence from an untrusted identity. Explain why a checksum stored beside a file cannot authenticate who built it.
+
+#### A09: Detection engineering, SIEM and incident response
+
+**Explain it:** A door alarm helps only if a sensor detects the event, the alert reaches someone, and that person knows how to respond.
+
+**Industry vocabulary:** SIEM means Security Information and Event Management. A SOC (Security Operations Center) investigates security events. Detection engineering creates and tests rules that turn events into useful alerts. A response playbook defines investigation and containment steps.
+
+**Workplace example:** Several denied vault requests across different item IDs trigger an alert. An analyst correlates account, request IDs and timing, determines whether the activity is malicious, and follows a response procedure.
+
+**Controls and equivalents:** Structured application logs supply evidence to a platform such as Microsoft Sentinel. Security operations teams tune detections; developers ensure the application emits usable events. General uptime monitoring and DAST reports do not replace application security telemetry.
+
+**Teaching evidence:** Trace one controlled event through logging, ingestion, detection and responder notification. Define retention and access rules, and check that sensitive values are absent from logs.
+
+#### A10: Outbound request security and egress control
+
+**Explain it:** With SSRF, an attacker persuades your server to act as their messenger. The server may be able to reach destinations that the attacker cannot access directly.
+
+**Industry vocabulary:** Egress is outbound traffic. A destination allowlist permits only specified targets. Network segmentation limits reachability. SSRF differs from CSRF: SSRF abuses server-originated requests, whereas CSRF abuses a user's browser context.
+
+**Workplace example:** A document importer accepts a URL. A secure design restricts destination selection, validates relevant addresses, controls redirects and limits outbound network access. If arbitrary destinations are unnecessary, use server-selected origins and constrained document IDs instead.
+
+**Controls and equivalents:** Semgrep or CodeQL can identify selected unsafe request flows. Configured dynamic or manual testing validates behavior. Application teams own destination handling; platform teams enforce available outbound restrictions. This is a combination of code controls and network policy, not a single “SSRF scanner.” See the [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html).
+
+**Teaching evidence:** Use controlled lab destinations to verify rejected unapproved targets and redirects. A hostname string check alone is insufficient when DNS resolution or redirection can change the eventual destination.
+
+### 2.3. How teams turn a finding into a verified fix
+
+Use this lifecycle to connect tools with professional responsibilities. A tool report is the beginning of a decision, and closure requires evidence.
+
+```mermaid
+flowchart TD
+    A[Scanner finding or security test failure] --> B[AppSec and developer triage]
+    B --> C{Confirmed risk?}
+    C -->|No| D[Document rationale and review suppression]
+    C -->|Yes| E[Assign owner and remediation priority]
+    E --> F[Fix code configuration or design]
+    F --> G[Peer review and repeat security test]
+    G --> H{Fix verified?}
+    H -->|No| F
+    H -->|Yes| I[Release through enforced controls]
+    I --> J[Confirm deployed behavior and monitoring]
+    J --> K[Close finding with evidence]
+```
+
+**Classroom discussion:** “The scanner is green. Can we release?” Ask students to identify the scanned scope, required approvals, deployment gates and operational evidence. Their answer should explain which risks were tested and which still need another control.
+
 ## 3. A01 — Broken Access Control
 
 **Risk:** A user can read or modify a resource they are not allowed to access. Being logged in does not mean being authorized to read every vault item.
