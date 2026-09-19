@@ -28,10 +28,12 @@ graph LR
   
   subgraph ShiftLeft ["Shift-Left Approach"]
     direction LR
-    S1[Security<br>Design] --> S2[Write Code<br>IDE Scan] --> S3[Build<br>SAST/SCA] --> S4[Test<br>DAST] --> S5[Deploy<br>Safely]
+    S1[Security<br>Design] --> S2[Write Code<br>IDE Scan] --> S3[Build<br>SAST/SCA] --> S4[Deploy to<br>Staging] --> S5[Test<br>DAST] --> S6[Deploy to<br>Prod]
     style S1 fill:#4ade80,color:#fff
     style S2 fill:#4ade80,color:#fff
     style S3 fill:#4ade80,color:#fff
+    style S4 fill:#4ade80,color:#fff
+    style S5 fill:#4ade80,color:#fff
   end
 ```
 
@@ -56,19 +58,30 @@ The CI/CD pipeline is the engine of DevSecOps. It enforces security gates automa
 - **CD (Continuous Deployment):** Prevents insecure container images from reaching production and enforces environment approval gates.
 
 ### Software Supply Chain Attacks
-A supply chain attack targets less secure elements in your build process, such as third-party libraries, vendor software, or the CI/CD tools themselves.
+A software supply chain attack compromises a component or process used to develop, build or distribute software, so malicious changes reach downstream users through a trusted delivery path. Targets include dependencies, maintainer accounts, build tools and artifact repositories. See [OWASP's software supply chain security guidance](https://cheatsheetseries.owasp.org/cheatsheets/Software_Supply_Chain_Security_Cheat_Sheet.html).
+
+This diagram illustrates **one possible dependency-compromise attack**, using a fictional package. The two execution paths are alternatives; an attack does not need to reach production to cause harm.
 
 ```mermaid
-graph TD
-  Hacker((Hacker)) -->|Compromises| Lib[Popular Open Source Library\ne.g., 'left-pad']
-  Dev((Developer)) -->|Writes Secure Code| App[Your Application]
-  App -->|npm install| Lib
-  App -->|Deploys to Prod| Prod[Production Server]
-  Prod -.->|Backdoor triggered| Hacker
-  style Hacker fill:#ef4444,color:#fff
-  style Lib fill:#fca5a5
+flowchart TD
+  Attacker["Attacker"] -->|Compromises publishing access| Package["Malicious package release<br/>Fictional dependency"]
+  Developer["Developer"] -->|Writes application code| Source["Application source and dependency lockfile"]
+  Source --> Build["Developer or CI environment<br/>Installs selected dependencies"]
+  Package -->|Selected release is downloaded| Build
+  Build -->|If malicious install or build code executes| BuildImpact["Build environment compromise<br/>Possible theft of accessible credentials"]
+  Build -->|If malicious runtime code is included| Artifact["Application artifact containing malicious code"]
+  Artifact -->|Deployed without detecting the compromise| Runtime["Production runtime"]
+  Runtime -->|If malicious code executes| RuntimeImpact["Possible data theft or unauthorized actions"]
+  BuildImpact -.->|Possible exfiltration| Attacker
+  RuntimeImpact -.->|Possible exfiltration| Attacker
+  style Attacker fill:#ef4444,color:#fff
+  style Package fill:#fca5a5
+  style BuildImpact fill:#fca5a5
+  style RuntimeImpact fill:#fca5a5
 ```
-- *Defense:* Treat third-party code as untrusted until verified, pin dependency versions, and scan constantly.
+**Teaching point:** Secure first-party code can still be affected by a malicious dependency. Pinning versions improves reproducibility but can also pin a compromised release. Known-vulnerability scanning may miss new malicious packages, and signed provenance does not prove the code is harmless.
+
+**Defenses:** Review dependency changes, use lockfiles and integrity checks, restrict unnecessary install scripts, isolate builds, minimize credential access, enforce appropriate egress policies, and verify artifact provenance and deployment identity. Combine these controls with scanning and monitoring.
 
 ### SBOM and Artifact Integrity
 - **SBOM (Software Bill of Materials):** A comprehensive, machine-readable list (like an ingredients label) of every third-party component, library, and framework used in your software. It instantly answers questions like: *"Are we using the vulnerable version of log4j anywhere?"*
