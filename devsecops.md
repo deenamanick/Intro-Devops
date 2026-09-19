@@ -8,6 +8,84 @@ This lesson deliberately uses the **2021 edition** and its A01–A10 numbering. 
 
 ---
 
+## DevSecOps Fundamentals
+
+Before diving into specific vulnerabilities, students must understand the core philosophy of DevSecOps.
+
+### What is DevSecOps?
+**DevSecOps** stands for Development, Security, and Operations. It is the practice of integrating security testing at every stage of the software development process. Instead of security being a final manual check done by a separate team just before release, it becomes a shared responsibility integrated directly into the daily automated workflow of developers and operators.
+
+### Shift-Left Security
+"Shift-Left" means moving security testing earlier (to the left) in the software development lifecycle (SDLC).
+
+```mermaid
+graph LR
+  subgraph Traditional Approach (Shift-Right)
+    direction LR
+    T1[Write Code] --> T2[Build] --> T3[Test] --> T4[Deploy] --> T5[Security Audit<br>Too Late & Expensive!]
+    style T5 fill:#f87171,color:#fff
+  end
+  
+  subgraph Shift-Left Approach
+    direction LR
+    S1[Security<br>Design] --> S2[Write Code<br>IDE Scan] --> S3[Build<br>SAST/SCA] --> S4[Test<br>DAST] --> S5[Deploy<br>Safely]
+    style S1 fill:#4ade80,color:#fff
+    style S2 fill:#4ade80,color:#fff
+    style S3 fill:#4ade80,color:#fff
+  end
+```
+
+*Why?* Fixing a security flaw during the coding phase is exponentially cheaper and faster than fixing it after it is deployed to production.
+
+### Secure SDLC (Software Development Life Cycle)
+A Secure SDLC embeds security artifacts and checks into every phase of development.
+
+```mermaid
+flowchart TD
+    Req[1. Requirements\nThreat Modeling] --> Des[2. Design\nArchitecture Review]
+    Des --> Code[3. Coding\nIDE Plugins / Secure Guidelines]
+    Code --> Test[4. Testing\nSAST, DAST, SCA Scans in CI]
+    Test --> Dep[5. Deployment\nIaC Scans & Hardening]
+    Dep --> Maint[6. Maintenance\nContinuous Monitoring & Logging]
+    Maint -.->|Feedback Loop| Req
+```
+
+### Security in CI/CD Pipelines
+The CI/CD pipeline is the engine of DevSecOps. It enforces security gates automatically:
+- **CI (Continuous Integration):** Fails the build if a developer pushes code containing hardcoded secrets or known vulnerable patterns.
+- **CD (Continuous Deployment):** Prevents insecure container images from reaching production and enforces environment approval gates.
+
+### Software Supply Chain Attacks
+A supply chain attack targets less secure elements in your build process, such as third-party libraries, vendor software, or the CI/CD tools themselves.
+
+```mermaid
+graph TD
+  Hacker((Hacker)) -->|Compromises| Lib[Popular Open Source Library\ne.g., 'left-pad']
+  Dev((Developer)) -->|Writes Secure Code| App[Your Application]
+  App -->|npm install| Lib
+  App -->|Deploys to Prod| Prod[Production Server]
+  Prod -.->|Backdoor triggered| Hacker
+  style Hacker fill:#ef4444,color:#fff
+  style Lib fill:#fca5a5
+```
+- *Defense:* Treat third-party code as untrusted until verified, pin dependency versions, and scan constantly.
+
+### SBOM and Artifact Integrity
+- **SBOM (Software Bill of Materials):** A comprehensive, machine-readable list (like an ingredients label) of every third-party component, library, and framework used in your software. It instantly answers questions like: *"Are we using the vulnerable version of log4j anywhere?"*
+
+```mermaid
+graph LR
+  Code[Source Code] --> Builder[CI/CD Pipeline]
+  Deps[Dependencies\nnpm, pip, etc.] --> Builder
+  Builder --> Image[Docker Image]
+  Builder --> SBOM[SBOM.json\n'Ingredients List']
+  SBOM -.->|Security team checks against| CVE[Known CVE Database]
+```
+
+- **Artifact Integrity:** Ensuring that the Docker image or binary you deploy is the exact same one you tested, without tampering. Achieved through cryptographic signing and build provenance attestations.
+
+---
+
 ## 0. Foundation: What is OWASP and Why Must We Follow It?
 
 ### 0.1 What is OWASP?

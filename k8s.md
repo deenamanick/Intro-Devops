@@ -86,10 +86,10 @@ Manages the overall cluster and its state.
 ### 🖥️ Worker Node Components
 Hosts containers and is controlled by the master node.
 
-- **Kubelet:** The primary agent running on each node that communicates with the master.
-- **Kube Proxy:** Maintains network rules on nodes for communication.
-- **Container Runtime:** Software that creates and runs containers (Docker, containerd, CRI-O).
-- **Container Runtime Interface (CRI):** Communication interface between kubelet and runtimes (Allows flexibility using CRI shims).
+- **Kubelet:** The primary "captain" agent running on each worker node. It registers the node with the cluster, listens for instructions from the Kube-API Server, and ensures that the containers described in PodSpecs are actually running and healthy. **(This is the most critical worker component!)**
+- **Kube Proxy:** Maintains network rules on nodes. These rules allow network communication to your Pods from network sessions inside or outside of your cluster.
+- **Container Runtime:** The underlying software responsible for actually pulling images and running containers (e.g., containerd, CRI-O, Docker).
+- **Container Runtime Interface (CRI):** The standardized communication interface between the Kubelet and the Container Runtime.
 
 ---
 
