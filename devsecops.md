@@ -6,6 +6,139 @@ This lesson deliberately uses the **2021 edition** and its A01–A10 numbering. 
 
 **Prerequisites:** Basic GitHub Actions, pull requests, HTTP, JavaScript, and application authentication. Allow approximately 90 minutes: 15 for the pipeline, 35 for the risk mappings, 30 for the lab, and 10 for discussion.
 
+---
+
+## 0. Foundation: What is OWASP and Why Must We Follow It?
+
+### 0.1 What is OWASP?
+
+**OWASP** stands for the **Open Worldwide Application Security Project**. It is a nonprofit foundation founded in 2001 that produces free, openly available security knowledge for developers, security engineers, and organizations worldwide.
+
+Think of OWASP as the **"WHO of Application Security"** — just as the World Health Organization publishes disease risk data for hospitals to take precautions, OWASP publishes real-world vulnerability data for software teams to take precautions.
+
+OWASP produces:
+- **The OWASP Top 10** — The 10 most critical web application security risks (updated every 3–4 years based on real breach data)
+- **OWASP ASVS** — Application Security Verification Standard (a testable requirements checklist)
+- **OWASP Testing Guide** — How to test applications for vulnerabilities
+- **OWASP Cheat Sheet Series** — Developer-friendly secure coding guides
+
+```mermaid
+flowchart LR
+    A["🌍 Real-World Breaches\n& CVE Data"] --> B["OWASP Analyzes\nPatterns"]
+    B --> C["Publishes OWASP Top 10\nEvery 3-4 Years"]
+    C --> D["Industry Adopts as\nSecurity Standard"]
+    D --> E["Regulators Reference\nOWASP in Compliance"]
+    E --> F["🏢 Your Pipeline\nImplements Controls"]
+    style F fill:#6366f1,color:#fff
+```
+
+---
+
+### 0.2 Why Must We Follow OWASP?
+
+Following OWASP is not optional for serious organizations. Here are the four key reasons:
+
+#### Reason 1: Real Money and Real Data is at Stake
+The OWASP Top 10 is derived from data contributed by **hundreds of organizations** representing **over 500,000 real applications**. Every item on the list represents vulnerabilities that attackers are actively exploiting **today**. Ignoring OWASP means ignoring known, proven attack vectors.
+
+> **Example:** The Equifax breach (2017) exposed 147 million people's personal data. The root cause was **A06 — Vulnerable and Outdated Components**. A patched library was available but not applied.
+
+#### Reason 2: Regulatory and Compliance Requirements
+OWASP is referenced by major compliance frameworks that organizations are legally required to follow:
+
+| Compliance Standard | How OWASP is Referenced |
+|---|---|
+| **PCI DSS v4** | Requires OWASP Top 10 as a minimum baseline for web application security |
+| **ISO 27001** | References OWASP practices in Annex A controls |
+| **GDPR (EU)** | Requires "appropriate technical measures" — OWASP defines what "appropriate" means |
+| **SOC 2** | Auditors use OWASP as benchmark for security controls |
+| **HIPAA (US)** | Healthcare apps must implement controls covering OWASP risks |
+
+#### Reason 3: It is the Universal Language of Security
+When a security engineer, auditor, or penetration tester says **"A03 Injection"** or **"BOLA"**, every team worldwide knows exactly what is being discussed. OWASP gives teams a **shared vocabulary** to communicate risks without ambiguity.
+
+#### Reason 4: It is How Attackers Think
+OWASP Top 10 is ranked by **exploitation likelihood × business impact**. Attackers use this exact same list to decide which vulnerabilities are worth targeting first. If you are not defending against the Top 10, you are leaving the most profitable doors unlocked.
+
+---
+
+### 0.3 What Does "Industry Standard" Mean for Pipelines?
+
+Most companies follow one of three maturity levels for their CI/CD security:
+
+```mermaid
+flowchart LR
+    subgraph L1 ["🟡 Level 1 — Basic\n(Most Startups)"]
+        direction TB
+        A1["Manual code review\nonly"] --> B1["Deploy on merge"]
+    end
+    subgraph L2 ["🟠 Level 2 — Standard\n(Mid-size Companies)"]
+        direction TB
+        A2["Linting + unit tests"] --> B2["One SCA or SAST tool"]
+        B2 --> C2["Deploy with approvals"]
+    end
+    subgraph L3 ["🟢 Level 3 — Advanced\n(Enterprise / Regulated)"]
+        direction TB
+        A3["SAST + SCA + Secrets\n+ DAST + CODEOWNERS"] --> B3["Signed attestations"]
+        B3 --> C3["Enforced gates\nall stages"]
+    end
+    L1 --> L2 --> L3
+    style L1 fill:#fef9c3
+    style L2 fill:#fed7aa
+    style L3 fill:#dcfce7
+```
+
+The **industry minimum standard** for a professional team in 2024 is **Level 2** — having at least one automated security scan integrated into the pull request workflow.
+
+---
+
+### 0.4 How the `jeevi-vault` Pipeline Exceeds the Industry Standard
+
+The `jeevi-vault` pipeline does not just meet the Level 2 industry standard — it implements a **Level 3 Enterprise-grade DevSecOps pipeline** with several capabilities that most organizations do not have.
+
+Here is a direct comparison:
+
+| Security Control | Basic Industry\n(Level 1) | Standard Industry\n(Level 2) | `jeevi-vault`\nPipeline (Level 3) |
+|---|:---:|:---:|:---:|
+| Secrets scanning (Gitleaks) | ❌ | Sometimes | ✅ Every PR |
+| SAST — Semgrep | ❌ | Sometimes | ✅ Weekly + on-demand |
+| SCA — OSV-Scanner | ❌ | Sometimes | ✅ Every PR + weekly |
+| Automated Dependabot PRs | ❌ | ❌ | ✅ Daily (Actions) + Weekly (npm) |
+| DAST — ZAP (dynamic testing) | ❌ | ❌ | ✅ Post-deploy staging |
+| CODEOWNERS enforcement | ❌ | Sometimes | ✅ Mandatory reviewers |
+| Action SHA pinning (supply chain) | ❌ | ❌ | ✅ All actions pinned to SHA |
+| Build provenance attestations | ❌ | ❌ | ✅ Signed + stored |
+| Runner egress hardening | ❌ | ❌ | ✅ step-security/harden-runner |
+| Dependency lifecycle (rotation) | ❌ | ❌ | ✅ Dependabot + labels |
+
+**Summary:** Most companies stop at "we run some tests before merging." The `jeevi-vault` pipeline defends across **7 distinct attack surfaces** (code, secrets, dependencies, configuration, supply chain, runtime behavior, and infrastructure) with automated enforcement gates at every stage.
+
+```mermaid
+flowchart TD
+    A["💻 Developer writes code"] --> B["🔒 Gate 1: CODEOWNERS\nmandatory reviewer"]
+    B --> C["🕵️ Gate 2: Gitleaks\nsecrets scan"]
+    C --> D["🔍 Gate 3: Semgrep SAST\ncode patterns"]
+    D --> E["📦 Gate 4: OSV-Scanner\ndependency CVEs"]
+    E --> F["🧪 Gate 5: Unit tests\n+ auth tests"]
+    F --> G["🏗️ Gate 6: Signed build\nprovenance attestation"]
+    G --> H["⚡ Gate 7: ZAP DAST\nlive app testing"]
+    H --> I["✅ Production Deploy"]
+    style A fill:#6366f1,color:#fff
+    style I fill:#22c55e,color:#fff
+    B:::gate
+    C:::gate
+    D:::gate
+    E:::gate
+    F:::gate
+    G:::gate
+    H:::gate
+    classDef gate fill:#1e293b,color:#fff
+```
+
+> **Key Teaching Point for Students:** Any single gate can fail and stop a deployment. This is called **defence in depth** — even if an attacker bypasses one control, the next gate catches it. A normal company with only one gate has no defence in depth.
+
+---
+
 ## 1. How the tools fit together
 
 | Control | Meaning | Main question |
