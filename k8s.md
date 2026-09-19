@@ -237,6 +237,19 @@ Provides DNS names for Services and Pods.
 - Kube-Scheduler assigns Pods to nodes.
 - Controllers constantly monitor and reconcile the state.
 
+### 3️⃣ Ingress (HTTP/HTTPS Routing)
+Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress resource.
+
+```mermaid
+graph TD
+  Client((Client)) -->|https://myapp.com/api| Ingress[Ingress Controller\nNGINX / Traefik]
+  Ingress -->|Path: /api| SvcAPI["API Service\n(ClusterIP)"]
+  Ingress -->|Path: /web| SvcWeb["Web Service\n(ClusterIP)"]
+  SvcAPI --> Pod1((API Pod))
+  SvcWeb --> Pod2((Web Pod))
+```
+> 💡 An Ingress controller is required to satisfy an Ingress. Only creating an Ingress resource has no effect.
+
 ---
 
 ## ⚙️ Phase 4: Storage, Configs & Security
@@ -245,8 +258,24 @@ Provides DNS names for Services and Pods.
 Containers are ephemeral. Volumes allow Pods to access persistent storage, local storage, or cloud storage to ensure data survives container restarts.
 
 ### 🔐 ConfigMaps and Secrets
-- **ConfigMap:** Stores configuration data in key-value pairs (injected as env vars or config files).
-- **Secrets:** Similar to ConfigMap but stores sensitive data (passwords, OAuth tokens, SSH keys). Data is **encoded**, not encrypted by default.
+- **ConfigMap:** Stores non-confidential configuration data in key-value pairs. Can be injected as environment variables or mounted as config files.
+- **Secrets:** Stores sensitive data (passwords, OAuth tokens, SSH keys). Data is base64 **encoded**, not encrypted by default (unless ETCD encryption is enabled).
+
+```mermaid
+graph LR
+  subgraph Kubernetes Objects
+    CM[ConfigMap\nDB_URL, LOG_LEVEL]
+    SEC[Secret\nDB_PASSWORD, API_KEY]
+  end
+  
+  subgraph Pod
+    App((App Container))
+  end
+  
+  CM -.->|Env Vars or File Mount| App
+  SEC -.->|Env Vars or File Mount| App
+```
+> 💡 Decoupling configuration from image content keeps containerized applications portable.
 
 ### 🏢 Namespaces
 Divides cluster resources between multiple teams or apps:
@@ -279,6 +308,27 @@ kubectl scale deployment hello-world --replicas=6
 - **Init Container:** Runs initialization tasks (like waiting for a database to be ready) *before* the main container starts.
 - **Liveness Probe:** A self-healing mechanism that automatically restarts a container if it becomes unresponsive or fails health checks.
 - **Multi-Container Pod:** Running two containers side-by-side in the same Pod for collaborative workloads.
+
+### 4️⃣ Resource Requests vs Limits
+Kubernetes uses requests and limits to manage CPU and memory resources for containers.
+
+- **Requests:** The minimum amount of CPU/Memory guaranteed for a container. The Kube-Scheduler uses this to decide which node to place the Pod on.
+- **Limits:** The maximum amount of CPU/Memory a container is allowed to use. 
+
+```mermaid
+graph TD
+  subgraph Node Capacity: 4 CPU, 16GB RAM
+    subgraph Container
+      R["Request\n(Guaranteed: 1 CPU, 1GB)"]
+      L["Limit\n(Max: 2 CPU, 2GB)"]
+      R --- L
+    end
+  end
+  
+  L -.->|Exceeds CPU Limit| CPU_Throttle["CPU Throttled\n(App slows down)"]
+  L -.->|Exceeds Memory Limit| OOM_Kill["OOMKilled\n(Pod crashes/restarts)"]
+```
+> 💡 **OOMKilled** (Out Of Memory Killed) happens when a container tries to use more memory than its limit. CPU limits only cause throttling, not crashes.
 
 ---
 
