@@ -111,6 +111,14 @@ graph LR
 ```
 > 💡 Containers inside the same Pod communicate over `localhost` and share the same IP address.
 
+**Useful Commands:**
+```bash
+kubectl get pods
+kubectl describe pod <pod-name>
+kubectl logs <pod-name>
+kubectl exec -it <pod-name> -- /bin/sh
+```
+
 ---
 
 ### 2️⃣ ReplicaSet
@@ -126,6 +134,13 @@ graph TD
   RS -. auto-creates .-> P4((Pod 4\nReplacement))
 ```
 > 💡 You rarely create ReplicaSets directly — **Deployments** manage them for you.
+
+**Useful Commands:**
+```bash
+kubectl get rs
+kubectl describe rs <rs-name>
+kubectl scale rs <rs-name> --replicas=<num>
+```
 
 ---
 
@@ -146,6 +161,14 @@ graph TD
 ```
 > 💡 During a rolling update, Pods in v1 are gradually replaced by v2 with **zero downtime**.
 
+**Useful Commands:**
+```bash
+kubectl get deployments
+kubectl rollout status deployment/<name>
+kubectl rollout history deployment/<name>
+kubectl rollout undo deployment/<name>
+```
+
 ---
 
 ### 4️⃣ StatefulSet
@@ -162,6 +185,12 @@ graph TD
   P2 --- PV2[(PV: disk-2)]
 ```
 > 💡 Each Pod gets a **predictable name** (`db-0`, `db-1`, `db-2`) and its **own persistent volume** that survives restarts.
+
+**Useful Commands:**
+```bash
+kubectl get sts
+kubectl describe sts <sts-name>
+```
 
 ---
 
@@ -186,6 +215,12 @@ graph TD
 ```
 > 💡 When a new node joins the cluster, the DaemonSet **automatically** schedules a Pod on it.
 
+**Useful Commands:**
+```bash
+kubectl get ds
+kubectl describe ds <ds-name>
+```
+
 ---
 
 ### 6️⃣ Service
@@ -199,6 +234,12 @@ graph LR
   SVC -->|Load Balances| P3((Pod 3\n10.1.0.4))
 ```
 > 💡 The Service **load-balances** traffic across healthy Pods. If a Pod dies and is replaced, the Service routes to the new Pod automatically.
+
+**Useful Commands:**
+```bash
+kubectl get svc
+kubectl describe svc <svc-name>
+```
 
 ---
 
@@ -250,6 +291,12 @@ graph TD
 ```
 > 💡 An Ingress controller is required to satisfy an Ingress. Only creating an Ingress resource has no effect.
 
+**Useful Commands:**
+```bash
+kubectl get ingress
+kubectl describe ingress <ingress-name>
+```
+
 ---
 
 ## ⚙️ Phase 4: Storage, Configs & Security
@@ -277,6 +324,14 @@ graph LR
 ```
 > 💡 Decoupling configuration from image content keeps containerized applications portable.
 
+**Useful Commands:**
+```bash
+kubectl get configmaps
+kubectl get secrets
+kubectl describe configmap <cm-name>
+kubectl get secret <secret-name> -o yaml
+```
+
 ### 🏢 Namespaces
 Divides cluster resources between multiple teams or apps:
 - `default`: Used if no namespace is specified.
@@ -294,15 +349,50 @@ A config file stored in `$HOME/.kube/config` that `kubectl` uses to communicate 
 - **users:** User credentials and keys.
 - **contexts:** Groups a cluster and a user to easily switch environments.
 
-### 2️⃣ Scaling & Rolling Updates
-**Scaling:** 
+### 2️⃣ Scaling & Deployment Strategies
+**Manual Scaling:** 
 ```bash
 kubectl scale deployment hello-world --replicas=6
 ```
 
-**Rolling Update:** A strategy to replace old Pods with new ones incrementally with **Zero Downtime**.
-- `maxUnavailable`: Max # of Pods that can be unavailable during update.
-- `maxSurge`: Max # of Pods that can be created above the desired limit.
+**Horizontal Pod Autoscaler (HPA):**
+Automatically scales the number of Pods in a replication controller, deployment, or stateful set based on observed CPU utilization (or other custom metrics).
+
+```mermaid
+graph LR
+  MetricsServer[Metrics Server\n(Observes CPU 85%)] --> HPA[HPA Controller]
+  HPA -->|Target CPU: 50%| DEP[Deployment]
+  DEP -.->|Scales Up| P1((Pod 1))
+  DEP -.->|Scales Up| P2((Pod 2))
+  DEP -.->|Scales Up| P3((Pod 3))
+```
+
+**Deployment Strategies:**
+How to deploy new versions of an application.
+
+1. **Rolling Update (Default):** Replaces old Pods with new ones incrementally with **Zero Downtime**.
+   - `maxUnavailable`: Max # of Pods that can be unavailable.
+   - `maxSurge`: Max # of Pods created above the limit.
+   ```mermaid
+   graph LR
+     v1[v1 Pods] -.->|Slowly Terminate| X(Old Version)
+     Y(New Version) -.->|Incrementally Start| v2[v2 Pods]
+   ```
+
+2. **Blue-Green:** Deploy the new version (Green) alongside the old one (Blue). Switch traffic all at once via the Service when Green is ready. Fast rollback.
+   ```mermaid
+   graph TD
+     SVC[Service] -.->|Switch Traffic| Blue[Blue: v1\nIdle]
+     SVC -->|Active Traffic| Green[Green: v2\nActive]
+   ```
+
+3. **Canary:** Route a small percentage of traffic to the new version to test it before a full rollout.
+   ```mermaid
+   graph LR
+     Client((Client)) --> SVC[Service / Ingress]
+     SVC -->|90% Traffic| v1[Stable v1]
+     SVC -->|10% Traffic| v2[Canary v2]
+   ```
 
 ### 3️⃣ Advanced Pod Features
 - **Init Container:** Runs initialization tasks (like waiting for a database to be ready) *before* the main container starts.
