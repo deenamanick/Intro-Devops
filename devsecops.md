@@ -112,6 +112,18 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 
 **Teaching evidence:** Show the same request succeeding for an owner and failing for another user. Also test an administrator-only action with an ordinary account. Hiding a button is not evidence of server-side enforcement.
 
+**Scenario diagram:**
+
+```mermaid
+flowchart LR
+    A["👤 Support Agent\n(Valid Login)"] -->|"GET /tickets/456\n(Another tenant's ticket)"|  B["🖥️ API Server"]
+    B --> C{"Is user authorized\nfor THIS resource?"}
+    C -->|"❌ Checks login only"| D["🔓 Returns Bob's data\nBOLA Vulnerability"]
+    C -->|"✅ Checks owner + tenant"| E["✅ 404 Not Found\nSafe Response"]
+    style D fill:#ff4d4d,color:#fff
+    style E fill:#22c55e,color:#fff
+```
+
 #### A02: Secrets management and cryptographic key management
 
 **Explain it:** Finding a key left on a desk and providing a secure key cabinet are different jobs. Gitleaks detects certain exposed credentials; secure storage and lifecycle management require additional controls.
@@ -123,6 +135,22 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 **Controls and equivalents:** GitHub secret scanning serves a similar detection role to Gitleaks. HashiCorp Vault provides secrets-management capabilities and key-management integrations; these complement scanning. Platform and security teams define storage, access and lifecycle policies. See [GitHub secret scanning](https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning) and [Vault capabilities](https://www.hashicorp.com/en/products/vault/features).
 
 **Teaching evidence:** Demonstrate a synthetic secret finding, then show how the application receives a secret without embedding it in source or logs. Discuss how a real leaked credential would be revoked. Key rotation for encrypted data also requires a plan to retain necessary decryption access.
+
+**Scenario diagram:**
+
+```mermaid
+flowchart TD
+    subgraph BAD ["❌ Insecure — Secret in Git"]
+        A1["DB_PASSWORD=abc123\nin source code"] --> B1["🕵️ Gitleaks detects\nexposed credential"]
+        B1 --> C1["🔥 Credential revoked\n+ full incident response"]
+    end
+    subgraph GOOD ["✅ Secure — Secret in Vault"]
+        A2["🔑 HashiCorp Vault\nor GitHub Secrets"] --> B2["Service fetches via\nWorkload Identity"]
+        B2 --> C2["✅ No secret in source\nAccess audited + rotated"]
+    end
+    style BAD fill:#fee2e2
+    style GOOD fill:#dcfce7
+```
 
 #### A03: Secure coding, SAST and DAST
 
@@ -136,6 +164,20 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 
 **Teaching evidence:** Show vulnerable code, the relevant finding, the corrected code and a test proving input remains data. Explain why a SQL fix does not automatically fix XSS or command injection.
 
+**Scenario diagram:**
+
+```mermaid
+flowchart LR
+    A["User Input:\n' OR 1=1 --"] --> B["String Concatenation\nSQL Query"]
+    A --> D["Parameterized\nQuery"]
+    B --> C["💥 All records exposed\nSQL Injection"]
+    D --> E["✅ Input treated\nas safe data"]
+    C -.->|"Caught by Semgrep / ZAP"| F["🔧 Fix: use bound parameters"]
+    F --> E
+    style C fill:#ff4d4d,color:#fff
+    style E fill:#22c55e,color:#fff
+```
+
 #### A04: Threat modeling and secure design review
 
 **Explain it:** An accurately built house can still be unsafe if the plan omitted door locks. Review the intended behavior before relying on scanners to inspect the implementation.
@@ -147,6 +189,18 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 **Controls and equivalents:** CODEOWNERS supports review routing. The broader industry practice is security design review with developers, product owners and application security engineers. OWASP ASVS (Application Security Verification Standard) provides requirements for security verification; it can turn a broad Top 10 concern into testable criteria. See [OWASP ASVS](https://owasp.org/projects/asvs).
 
 **Teaching evidence:** Ask students to draw a trust boundary and write one abuse case, its mitigation and an acceptance test. A review approval should be supported by a recorded design decision.
+
+**Scenario diagram:**
+
+```mermaid
+flowchart TD
+    A["📋 Feature Request:\nPassword Recovery"] --> B["🛡️ Threat Modeling Session\nDev + Product + AppSec"]
+    B --> C["Define abuse cases:\n- Token reuse\n- Account enumeration\n- Rate limit bypass"]
+    C --> D["Write security acceptance\ncriteria in ticket"]
+    D --> E["CODEOWNERS review gate"]
+    E --> F["✅ Design approved\nwith recorded decision"]
+    style F fill:#22c55e,color:#fff
+```
 
 #### A05: Configuration hardening and infrastructure security
 
@@ -160,6 +214,21 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 
 **Teaching evidence:** Compare an unsafe setting, its policy finding and the corrected setting. Explain whether the check inspects source configuration, the CI runner, or the live application.
 
+**Scenario diagram:**
+
+```mermaid
+flowchart LR
+    A["Terraform PR:\nStorage bucket = public"] --> B["🔍 Checkov IaC Scan\nin CI pipeline"]
+    B --> C{"Policy violation?"}
+    C -->|"✅ Yes — blocked"| D["❌ PR fails\nDeveloper notified"]
+    C -->|"No violation"| E["ZAP checks live app\nHTTP headers + config"]
+    D --> F["🔧 Fix: set bucket to private"]
+    F --> E
+    E --> G["✅ Deployment allowed"]
+    style D fill:#ff4d4d,color:#fff
+    style G fill:#22c55e,color:#fff
+```
+
 #### A06: Software composition analysis and vulnerability management
 
 **Explain it:** Your application inherits risks from the libraries it uses, including indirect dependencies brought in by other libraries.
@@ -171,6 +240,20 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 **Controls and equivalents:** OSV-Scanner and Snyk Open Source serve SCA needs with differing coverage. Dependabot supports update proposals. A mature process includes recurring scans, inventory and documented exceptions with review dates; a clean initial release scan is insufficient when advisories appear later.
 
 **Teaching evidence:** Have students trace an advisory to a lockfile entry, a patch PR, passing tests and a deployed version. An SBOM is an inventory, not proof that listed components are safe.
+
+**Scenario diagram:**
+
+```mermaid
+flowchart TD
+    A["🚨 CVE published for\nlodash v4.17.20"] --> B["OSV-Scanner detects\nin package-lock.json"]
+    B --> C["CI build FAILS"]
+    C --> D["Dependabot opens\nauto-patch PR"]
+    D --> E["Tests pass on\nupdated version"]
+    E --> F["✅ PR merged\nFixed version deployed"]
+    F --> G["OSV scan passes\nAdvisory closed"]
+    style C fill:#ff4d4d,color:#fff
+    style G fill:#22c55e,color:#fff
+```
 
 #### A07: Identity and Access Management and session security
 
@@ -184,6 +267,20 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 
 **Teaching evidence:** Test a rejected expired credential and the configured logout or revocation behavior. Do not assume that all self-contained access tokens become invalid immediately after logout; define the intended lifetime and revocation strategy.
 
+**Scenario diagram:**
+
+```mermaid
+flowchart LR
+    A["👤 User Login"] --> B["Identity Provider\nKeycloak / Auth0"]
+    B --> C["Issues JWT Token\nwith expiry + audience"]
+    C --> D["App validates:\n- Signature ✅\n- Expiry ✅\n- Audience ✅"]
+    D --> E["✅ Access granted"]
+    C -->|"Token expired or\nwrong audience"| F["❌ 401 Unauthorized"]
+    A -->|"Logout"| G["Session revoked\n+ token invalidated"]
+    style F fill:#ff4d4d,color:#fff
+    style E fill:#22c55e,color:#fff
+```
+
 #### A08: Software supply chain security and release verification
 
 **Explain it:** A package labeled “official release” needs evidence connecting its exact contents to the expected build process.
@@ -195,6 +292,20 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 **Controls and equivalents:** Action SHA pinning restricts action references. GitHub artifact attestations and Sigstore Cosign support verifiable supply chain evidence. Build and platform teams must enforce verification; signatures are useful only when the consumer checks the correct trust policy.
 
 **Teaching evidence:** Demonstrate rejection after changing the artifact, and rejection of evidence from an untrusted identity. Explain why a checksum stored beside a file cannot authenticate who built it.
+
+**Scenario diagram:**
+
+```mermaid
+flowchart TD
+    A["CI Build triggered\non verified commit"] --> B["Build artifact\n+ record provenance"]
+    B --> C["Sign attestation\nvia Sigstore / Cosign"]
+    C --> D["Store artifact\n+ provenance-attestation.json"]
+    D --> E["Deployment gate:\nverify digest + signer identity"]
+    E -->|"✅ Trusted builder\nDigest matches"| F["✅ Deploy to production"]
+    E -->|"❌ Unknown signer\nor digest mismatch"| G["🚫 Deployment rejected"]
+    style F fill:#22c55e,color:#fff
+    style G fill:#ff4d4d,color:#fff
+```
 
 #### A09: Detection engineering, SIEM and incident response
 
@@ -208,6 +319,21 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 
 **Teaching evidence:** Trace one controlled event through logging, ingestion, detection and responder notification. Define retention and access rules, and check that sensitive values are absent from logs.
 
+**Scenario diagram:**
+
+```mermaid
+flowchart LR
+    A["🔐 Multiple denied\nVault requests"] --> B["Structured logs\nemitted by app"]
+    B --> C["Ingested into SIEM\nMicrosoft Sentinel"]
+    C --> D["Detection rule fires:\n5+ denials in 60s"]
+    D --> E["🚨 Alert sent to SOC"]
+    E --> F["Analyst investigates:\ncorrelate account + timing"]
+    F -->|"Malicious"| G["Follow incident response\nplaybook"]
+    F -->|"False positive"| H["✅ Tune detection rule"]
+    style E fill:#f59e0b,color:#fff
+    style G fill:#ff4d4d,color:#fff
+```
+
 #### A10: Outbound request security and egress control
 
 **Explain it:** With SSRF, an attacker persuades your server to act as their messenger. The server may be able to reach destinations that the attacker cannot access directly.
@@ -219,6 +345,21 @@ For each risk, explain **what can go wrong, which control helps, who implements 
 **Controls and equivalents:** Semgrep or CodeQL can identify selected unsafe request flows. Configured dynamic or manual testing validates behavior. Application teams own destination handling; platform teams enforce available outbound restrictions. This is a combination of code controls and network policy, not a single “SSRF scanner.” See the [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html).
 
 **Teaching evidence:** Use controlled lab destinations to verify rejected unapproved targets and redirects. A hostname string check alone is insufficient when DNS resolution or redirection can change the eventual destination.
+
+**Scenario diagram:**
+
+```mermaid
+flowchart LR
+    A["Attacker sends URL:\nhttp://internal-metadata/"] --> B["Document Importer\naccepts any URL"]
+    B -->|"❌ No validation"| C["🖥️ Server fetches\ninternal resource"]
+    C --> D["💥 Cloud metadata or\ninternal API exposed"]
+    B -->|"✅ Allowlist enforced"| E["Validate destination\nagainst approved list"]
+    E --> F["✅ Unapproved host\nrejected with 400"]
+    D -.->|"Caught by Semgrep"| G["🔧 Fix: allowlist +\negress restriction"]
+    G --> F
+    style D fill:#ff4d4d,color:#fff
+    style F fill:#22c55e,color:#fff
+```
 
 ### 2.3. How teams turn a finding into a verified fix
 
